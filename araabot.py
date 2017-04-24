@@ -7,7 +7,7 @@ Email: trukise@gmail.com
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from commands.about import about
 from commands.start import start
-from commands.pictos import getPictosBN, getPictosColor
+from commands.pictos import getPictosBN, getPictosColor, getPictos
 import config
 
 import telegram
@@ -50,6 +50,8 @@ def main():
 
     updater.dispatcher.add_handler(CommandHandler('getPicsColor', getPictosColor))
     updater.dispatcher.add_handler(CommandHandler('getPicsBN', getPictosBN))
+    updater.dispatcher.add_handler(CommandHandler('getPictos', getPictos))
+
 
     updater.dispatcher.add_handler(CommandHandler('about', about))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
