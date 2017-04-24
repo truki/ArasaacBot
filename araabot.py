@@ -26,7 +26,7 @@ def echo(bot, update):
                   reply_markup=reply_markup)
 
 
-if __name__ == "__main__":
+def main():
     #Configure logging module
     config.logConfig()
 
@@ -56,3 +56,6 @@ if __name__ == "__main__":
 
     updater.start_polling()
     updater.idle()
+
+if __name__ == "__main__":
+    main()
