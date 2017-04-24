@@ -6,6 +6,8 @@ def start(bot, update):
     msg += "/about - shows about me information"
 
     # Send the message
+    bot.sendPhoto(chat_id=update.message.chat_id,
+                  photo=open('images/arasaac_hd_boy_100x100.png', 'rb'))
     bot.send_message(chat_id=update.message.chat_id,
                      text=msg.format(
                          user_name=update.message.from_user.first_name,
