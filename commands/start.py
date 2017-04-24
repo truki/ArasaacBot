@@ -4,8 +4,9 @@ def start(bot, update):
     msg += "What would you like to do? \n"
     msg += "Pictograms: \n"
     msg += "========================================\n"
-    msg += "/getPicsColor <text1,text2,...> - List color pictograms that contains textn words \n"
-    msg += "/getPicsBN <text1,text2,...> - List BN pictograms that contains textn words \n"
+    msg += "/getPicsColor text1,text2,... - List color pictograms that contains textn words \n"
+    msg += "/getPicsBW text1,text2,... - List BN pictograms that contains textn words \n"
+    msg += "/getPictos - Init wizard to contruct a query for searching pictograms \n"
     msg += "\n"
 
     msg += "Other commands: \n"

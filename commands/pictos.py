@@ -16,7 +16,7 @@ def getPictosBN(bot, update, user_data):
 
     pass
 
-ef getPictos(bot, update):
+def getPictos(bot, update):
     '''
     Functions launched when /getPictos command is executed.
     Init a wizard to specified the search of pictograms.
