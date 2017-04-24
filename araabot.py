@@ -7,6 +7,7 @@ Email: trukise@gmail.com
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import os
+import urllib3
 
 def loadAraasacApiKey(araasacApiKeyFile):
     '''
@@ -32,6 +33,14 @@ def loadTelegramApiKey(telegramApiKeyFile):
     except:
         print("Error reading Telegram Bot API Key: FAIL")
 
+def proxySettings():
+    proxyInput = input("is there a proxy web?[y/n]")
+    if proxyInput == 'y':
+        proxyConfiguration = input("Introduce proxy settings [(http|https)://<ip>:<port>/] :")
+        return (True, proxyConfiguration)
+    else:
+        proxyConfiguration = ""
+        return (False, proxyConfiguration)
 
 def logConfig():
     '''
@@ -57,6 +66,12 @@ def echo(bot, update):
 
 if __name__ == "__main__":
     logConfig()
+    (proxyEnable, proxyConfiguration) = proxySettings()
+    if proxyEnable:
+        requestPool = urllib3.ProxyManager('http://10.205.96.59:3128/')
+    else:
+        requestPool = urllib3.PoolManager()
+        
     ARAASAC_API_KEY = loadAraasacApiKey(".araasacApiKey")
     TELEGRAM_API_KEY = loadTelegramApiKey(".telegramApiKey")
 
