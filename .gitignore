@@ -1,5 +1,7 @@
 # API keyfile
 .apiKey
+.telegramApiKey
+.araasacApiKey
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

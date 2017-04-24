@@ -10,17 +10,29 @@ from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import os
 
-def loadApiKey(apiKeyFile):
+def loadAraasacApiKey(araasacApiKeyFile):
     '''
     Load API KEY of Araaac from hidden file
     '''
     try:
-        print(apiKeyFile)
-        file = open(apiKeyFile, 'r')
-        apiKey = file.read().rstrip('\n')
-        return apiKey
+        file = open(araasacApiKeyFile, 'r')
+        araasacApiKey = file.read().rstrip('\n')
+        print("Araasac API KEY Read it: OK")
+        return araasacApiKey
     except:
-        print("Error")
+        print("Error reading Araasac API Key: FAIL" )
+
+def loadTelegramApiKey(telegramApiKeyFile):
+    '''
+    Load API KEY of Telegram's Bot from hidden file
+    '''
+    try:
+        file = open(telegramApiKeyFile, 'r')
+        telegramApiKey = file.read().rstrip('\n')
+        print("Telegram Bot API KEY Read it: OK")
+        return telegramApiKey
+    except:
+        print("Error reading Telegram Bot API Key: FAIL")
 
 
 def logConfig():
@@ -44,16 +56,17 @@ def hello(bot, update):
 def echo(bot, update):
     update.message.reply_text(update.message.text)
 
-updater = Updater('371175982:AAEr49IbinBITl0KKEqrb1K4MB4rK8Pv8vg')
-
-updater.dispatcher.add_handler(CommandHandler('about', about))
-updater.dispatcher.add_handler(CommandHandler('Hello', hello))
-updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
-
 
 if __name__ == "__main__":
     logConfig()
-    API_KEY = loadApiKey(".apiKey")
-    print(API_KEY)
+    ARAASAC_API_KEY = loadAraasacApiKey(".araasacApiKey")
+    TELEGRAM_API_KEY = loadTelegramApiKey(".telegramApiKey")
+
+    updater = Updater(TELEGRAM_API_KEY)
+
+    updater.dispatcher.add_handler(CommandHandler('about', about))
+    updater.dispatcher.add_handler(CommandHandler('Hello', hello))
+    updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
+
     updater.start_polling()
     updater.idle()
