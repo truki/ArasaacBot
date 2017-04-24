@@ -3,15 +3,15 @@ Bot that interact with Araasac API to retrieve resources
 Developer: @trukise
 Email: trukise@gmail.com
 '''
+import config
+import urllib3
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+import telegram
+
 from commands.about import about
 from commands.start import start
-from commands.pictos import getPictosBN, getPictosColor, getPictos
-import config
-
-import telegram
-import urllib3
+from commands.pictos import getPictosBW, getPictosColor, getPictos
 
 def echo(bot, update):
     more_keyboard = telegram.InlineKeyboardButton("More...", callback_data='1')
@@ -30,16 +30,8 @@ def main():
     #Configure logging module
     config.logConfig()
 
-    #Configure urllib3 pool depending if we have a proxy web or not
-    (proxyEnable, proxyConfiguration) = config.proxySettings()
-    if proxyEnable:
-        requestPool = urllib3.ProxyManager('http://10.205.96.59:3128/')
-    else:
-        #requestPool = urllib3.PoolManager()
-        requestPool = urllib3.ProxyManager('http://10.205.96.59:3128/')
-
     # Get ARASAAC API KEY and TELEGRAM_API_KEY
-    ARAASAC_API_KEY = config.loadAraasacApiKey(".araasacApiKey")
+    ARAASAC_API_KEY = config.loadAraasacApiKey(".arasaacApiKey")
     TELEGRAM_API_KEY = config.loadTelegramApiKey(".telegramApiKey")
 
     # Creating an updater object of the Bot
@@ -48,8 +40,8 @@ def main():
     # Declaring handlers and added to dispatcher
     updater.dispatcher.add_handler(CommandHandler('start', start))
 
-    updater.dispatcher.add_handler(CommandHandler('getPicsColor', getPictosColor))
-    updater.dispatcher.add_handler(CommandHandler('getPicsBN', getPictosBN))
+    updater.dispatcher.add_handler(CommandHandler('getPicsColor', getPictosColor, pass_args=True))
+    updater.dispatcher.add_handler(CommandHandler('getPicsBN', getPictosBW, pass_args=True))
     updater.dispatcher.add_handler(CommandHandler('getPictos', getPictos))
 
 
