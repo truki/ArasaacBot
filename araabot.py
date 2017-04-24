@@ -1,5 +1,3 @@
-#!/home/sergio/anaconda3/bin/python
-
 '''
 Bot that interact with Araasac API to retrieve resources
 Developer: @trukise
