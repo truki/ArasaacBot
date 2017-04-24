@@ -12,13 +12,6 @@ import config
 import telegram
 import urllib3
 
-
-
-def hello(bot, update):
-    update.message.reply_text('Hello {}'.format(update.message.from_user.username))
-    bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please toalk")
-    update.message.reply_text('Hello {}'.format("I'm a bot, please toalk"))
-
 def echo(bot, update):
     more_keyboard = telegram.InlineKeyboardButton("More...", callback_data='1')
     custom_keyboard = [[more_keyboard]]
@@ -54,7 +47,6 @@ if __name__ == "__main__":
     # Declaring handlers and added to dispatcher
     updater.dispatcher.add_handler(CommandHandler('start', start))
     updater.dispatcher.add_handler(CommandHandler('about', about))
-    updater.dispatcher.add_handler(CommandHandler('Hello', hello))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
 
     updater.start_polling()
