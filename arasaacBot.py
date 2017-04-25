@@ -7,12 +7,15 @@ import config
 import logging
 import urllib3
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler
 import telegram
 
 from commands.about import about
 from commands.start import start
 import commands.pictos
+
+from inline.pictoInline import pictoInline
+
 
 ARASAAC_API_KEY = ""
 TELEGRAM_API_KEY = ""
@@ -21,6 +24,7 @@ global http
 
 
 def echo(bot, update):
+    '''
     more_keyboard = telegram.InlineKeyboardButton("More...", callback_data='1')
     custom_keyboard = [[more_keyboard]]
     reply_markup = telegram.InlineKeyboardMarkup(custom_keyboard)
@@ -31,6 +35,10 @@ def echo(bot, update):
                   photo='http://www.arasaac.org/repositorio/originales/7202.png',
                   caption="Perro",
                   reply_markup=reply_markup)
+    '''
+    pass
+
+
 
 
 def main():
@@ -69,6 +77,8 @@ def main():
 
     updater.dispatcher.add_handler(CommandHandler('about', about))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
+
+    updater.dispatcher.add_handler(InlineQueryHandler(pictoInline))
 
     # init Bot
     updater.start_polling()

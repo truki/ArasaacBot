@@ -28,6 +28,8 @@ def getPictosColor(bot, update, args):
         bot.send_message(chat_id=update.message.chat_id,
                      text='<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>',
                      parse_mode=telegram.ParseMode.HTML)
+        bot.send_audio(chat_id=update.message.chat_id,
+                       audio=picto['soundMP3URL'])
 
 def getPictosBW(bot, update, args):
     '''
