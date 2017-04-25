@@ -4,6 +4,7 @@ Developer: @trukise
 Email: trukise@gmail.com
 '''
 import config
+import logging
 import urllib3
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
@@ -11,7 +12,13 @@ import telegram
 
 from commands.about import about
 from commands.start import start
-from commands.pictos import getPictosBW, getPictosColor, getPictos
+import commands.pictos
+
+ARASAAC_API_KEY = ""
+TELEGRAM_API_KEY = ""
+
+global http
+
 
 def echo(bot, update):
     more_keyboard = telegram.InlineKeyboardButton("More...", callback_data='1')
@@ -28,11 +35,24 @@ def echo(bot, update):
 
 def main():
     #Configure logging module
-    config.logConfig()
+    logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                        level=logging.INFO)
+    logger = logging.getLogger(__name__)
+    logger.info('Starting logger')
 
     # Get ARASAAC API KEY and TELEGRAM_API_KEY
-    ARAASAC_API_KEY = config.loadAraasacApiKey(".arasaacApiKey")
+    global ARASAAC_API_KEY
+    ARASAAC_API_KEY = config.loadArasaacApiKey(".arasaacApiKey")
+
+    global TELEGRAM_API_KEY
     TELEGRAM_API_KEY = config.loadTelegramApiKey(".telegramApiKey")
+
+    # Global variable to store user operations
+    global users
+    users = {}
+
+    http = config.httpPool()
+    logger.info(type(http))
 
     # Creating an updater object of the Bot
     updater = Updater(TELEGRAM_API_KEY)
@@ -40,16 +60,21 @@ def main():
     # Declaring handlers and added to dispatcher
     updater.dispatcher.add_handler(CommandHandler('start', start))
 
-    updater.dispatcher.add_handler(CommandHandler('getPicsColor', getPictosColor, pass_args=True))
-    updater.dispatcher.add_handler(CommandHandler('getPicsBN', getPictosBW, pass_args=True))
-    updater.dispatcher.add_handler(CommandHandler('getPictos', getPictos))
-
+    updater.dispatcher.add_handler(CommandHandler('getPicsColor',
+                                                  commands.pictos.getPictosColor,
+                                                  pass_args=True))
+    updater.dispatcher.add_handler(CommandHandler('getPicsBN', commands.pictos.getPictosBW,
+                                                  pass_args=True))
+    updater.dispatcher.add_handler(CommandHandler('getPictos', commands.pictos.getPictos))
 
     updater.dispatcher.add_handler(CommandHandler('about', about))
     updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
 
+    # init Bot
     updater.start_polling()
     updater.idle()
+    logger.info("Bot started")
+
 
 if __name__ == "__main__":
     main()

@@ -1,6 +1,10 @@
-import json
-import urllib3
 import config
+import json
+import logging
+import urllib3
+
+logger = logging.getLogger(__name__)
+
 
 def getPictosColor(bot, update, args):
     '''
@@ -8,17 +12,15 @@ def getPictosColor(bot, update, args):
     Returns json python dictionary with all color pictograms that contains
     some on the words included in user_data
     '''
-    #Configure urllib3 pool depending if we have a proxy web or not
-    (proxyEnable, proxyConfiguration) = config.proxySettings()
-    if proxyEnable:
-        requestPool = urllib3.ProxyManager('http://10.205.96.59:3128/')
-    else:
-        requestPool = urllib3.PoolManager()
-        #global requestPool = urllib3.ProxyManager('http://10.205.96.59:3128/')
-    http = requestPool
-    req = http.request('GET', 'http://arasaac.org/api/index.php?callback=json&language=ES&word=perro&catalog=colorpictos&nresults=2&thumbnailsize=150&TXTlocate=1&KEY=Xmw49mDsuGduf1qdD8fQ')
-    print(req.status)
-    print(json.loads(req.data.decode('utf-8')))
+    query = 'http://arasaac.org/api/index.php?callback=json'
+    query += '&language=ES'
+    query += '&word='+args[0]
+    query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=1'
+    query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+    logger.info("QUERY: {}".format(query))
+    http = config.httpPool()
+    logger.info("Type: {}".format(type(http)))
+    req = http.request('GET', query)
     bot.send_message(chat_id=update.message.chat_id,
                      text=json.loads(req.data.decode('utf-8')))
 
@@ -29,6 +31,7 @@ def getPictosBW(bot, update, args):
     some on the words included in user_data
     '''
     pass
+
 
 def getPictos(bot, update):
     '''
