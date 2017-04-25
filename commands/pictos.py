@@ -1,6 +1,7 @@
 import config
 import json
 import logging
+import telegram
 import urllib3
 
 logger = logging.getLogger(__name__)
@@ -19,10 +20,13 @@ def getPictosColor(bot, update, args):
     query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
     logger.info("QUERY: {}".format(query))
     http = config.httpPool()
-    logger.info("Type: {}".format(type(http)))
     req = http.request('GET', query)
-    bot.send_message(chat_id=update.message.chat_id,
-                     text=json.loads(req.data.decode('utf-8')))
+    datos= json.loads(req.data.decode('utf-8'))
+    pictos = datos["symbols"]
+    for picto in pictos:
+        bot.send_message(chat_id=update.message.chat_id,
+                     text='<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>',
+                     parse_mode=telegram.ParseMode.HTML)
 
 def getPictosBW(bot, update, args):
     '''
