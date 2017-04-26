@@ -68,10 +68,10 @@ def main():
     # Declaring handlers and added to dispatcher
     updater.dispatcher.add_handler(CommandHandler('start', start))
 
-    updater.dispatcher.add_handler(CommandHandler('getPicsColor',
+    updater.dispatcher.add_handler(CommandHandler('PicsColor',
                                                   commands.pictos.getPictosColor,
                                                   pass_args=True))
-    updater.dispatcher.add_handler(CommandHandler('getPicsBW', commands.pictos.getPictosBW,
+    updater.dispatcher.add_handler(CommandHandler('PicsBW', commands.pictos.getPictosBW,
                                                   pass_args=True))
     updater.dispatcher.add_handler(CommandHandler('getPictos', commands.pictos.getPictos))
 
