@@ -19,8 +19,12 @@ def getPictos(language, word):
     pictos = datos["symbols"]
     logger.info("/getPicsColor PICTOS: {}".format(pictos))
     texto = ""
-    for picto in pictos:
-        texto += '<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>'+'\n\n'
+    if len(pictos) > 0:
+        for picto in pictos:
+            texto += '<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>'+'\n\n'
+    else:
+        texto = "<b>No hay resultados</b>"
+    
     logger.info("TEXTO: {}".format(texto))
     return texto
     #for picto in pictos:
