@@ -1,9 +1,34 @@
 import logging
+import sqlite3
 import urllib3
 from configparser import ConfigParser
 
 logger = logging.getLogger(__name__)
 parser = ConfigParser()
+
+
+def loadDatabaseConfiguration(name):
+    try:
+        conn = sqlite3.connect(name)
+        logger.info("Connected to database: {}".format(name))
+        return conn
+    except:
+        logger.error("Error connecting to database: {}".format(name))
+        exit(-1)
+
+def createBotBatabase(name):
+    try:
+        conn = loadDatabaseConfiguration(name)
+        c = conn.cursor()
+        c.execute('''CREATE TABLE IF NOT EXISTS inlines
+                     (word text PRIMARY KEY, pictos text)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS translations
+                     (id int PRIMARY KEY, texToTranslate text)''')
+        conn.commit()
+        conn.close()
+    except:
+        logger.error("Error creating tables on database {}".format(name))
+
 
 def loadArasaacApiKey(araasacApiKeyFile):
     '''

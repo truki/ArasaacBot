@@ -91,6 +91,9 @@ def main():
     http = config.httpPool()
     logger.info(type(http))
 
+    # Create database (sqlite3) bot.db
+    config.createBotBatabase("bot.sqlite3")
+
     # Creating an updater object of the Bot
     updater = Updater(TELEGRAM_API_KEY)
 
