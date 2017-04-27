@@ -14,7 +14,7 @@ from commands.about import about
 from commands.start import start
 import commands.pictos
 
-from inline.pictoInline import pictoInline
+import inline.pictoInline
 
 
 ARASAAC_API_KEY = ""
@@ -113,9 +113,11 @@ def main():
 
     updater.dispatcher.add_handler(MessageHandler(Filters.text, echo))
 
-    updater.dispatcher.add_handler(InlineQueryHandler(pictoInline))
+    updater.dispatcher.add_handler(InlineQueryHandler(inline.pictoInline.pictoInline))
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(button_xxx, pattern="xxx"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_prev, pattern="inline.prev"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_next, pattern="inline.next"))
+
     updater.dispatcher.add_handler(CallbackQueryHandler(button_yyy, pattern="yyy"))
     updater.dispatcher.add_handler(CallbackQueryHandler(button_zzz, pattern="zzz", pass_user_data=True,))
 
