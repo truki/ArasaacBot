@@ -21,7 +21,7 @@ def createBotBatabase(name):
         conn = loadDatabaseConfiguration(name)
         c = conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS inlines
-                     (word text PRIMARY KEY, pictos text)''')
+                     (word text, language text, pictos text, PRIMARY KEY (word, language) )''')
         c.execute('''CREATE TABLE IF NOT EXISTS translations
                      (id int PRIMARY KEY, texToTranslate text)''')
         conn.commit()
