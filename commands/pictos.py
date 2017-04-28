@@ -56,11 +56,3 @@ def getPictosBW(bot, update, args):
                      parse_mode=telegram.ParseMode.HTML)
         bot.send_audio(chat_id=update.message.chat_id,
                        audio=picto['soundMP3URL'])
-
-
-def getPictos(bot, update):
-    '''
-    Functions launched when /getPictos command is executed.
-    Init a wizard to specified the search of pictograms.
-    '''
-    pass
