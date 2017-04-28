@@ -19,7 +19,9 @@ def button_prev(bot, update):
     print(word)
     language = data[4]
     print(language)
+
     if pos > 0:
+
         try:
             conn = config.loadDatabaseConfiguration("bot.sqlite3")
             c = conn.cursor()
@@ -32,9 +34,12 @@ def button_prev(bot, update):
         finally:
             conn.close()
         pos = pos - 1
+        reply_markup = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.'+str(pos)+'.'+word+'.'+language),
+                     telegram.InlineKeyboardButton("Next >", callback_data='inline.next.'+str(pos)+'.'+word+'.'+language)]]
         bot.editMessageText(text='<a href="'+pictos[pos]['imagePNGURL']+'">'+pictos[pos]['name']+'</a>'+'\n\n',
                             inline_message_id=query.inline_message_id,
-                            parse_mode="HTML")
+                            parse_mode="HTML",
+                            reply_markup = telegram.InlineKeyboardMarkup(reply_markup))
 
 def button_next(bot, update):
     query = update.callback_query
@@ -47,6 +52,7 @@ def button_next(bot, update):
     print(word)
     language = data[4]
     print(language)
+
     try:
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
@@ -59,9 +65,14 @@ def button_next(bot, update):
     finally:
         conn.close()
     pos = pos + 1
+
+    reply_markup = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.'+str(pos)+'.'+word+'.'+language),
+                 telegram.InlineKeyboardButton("Next >", callback_data='inline.next.'+str(pos)+'.'+word+'.'+language)]]
+
     bot.editMessageText(text='<a href="'+pictos[pos]['imagePNGURL']+'">'+pictos[pos]['name']+'</a>'+'\n\n',
                         inline_message_id=query.inline_message_id,
-                        parse_mode="HTML")
+                        parse_mode="HTML",
+                        reply_markup = telegram.InlineKeyboardMarkup(reply_markup))
 
 def insertPictosDatabase(word, language, pictos):
     '''
