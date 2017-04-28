@@ -3,7 +3,29 @@
 # ArasaacBot
 
 ## Overview
-Telegram Bot that interact with Araasac Web API. Professional and people with language or comunication disorders could use to search and use pictograms in an easy and fast way.
+Telegram Bot that interact with Araasac Web API. Professionals and persons with language or communication disorders could use to search and use pictograms in an easy and fast way.
+
+## Commands.
+
+Lists of commands you can use:
+
+### picsColor
+
+```/picsColor <word>```
+
+### picsBW
+
+```/picsBW <word>```
+
+### translate
+
+  ```/translate <text to translate>```
+
+
+## Inline Mode
+
+```@arasaacbot <word>```
+
 
 ## Credits
 This software is property of Sergio Sánchez Trujillo (@trukise) and logopedaSUR (http://www.logopedasur.es).
