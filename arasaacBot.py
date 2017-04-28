@@ -62,7 +62,11 @@ def main():
     # picsBW command - Get pictograms in BW that contains the word passed
     updater.dispatcher.add_handler(CommandHandler('picsBW', commands.pictos.getPictosBW,
                                                   pass_args=True))
-                                                  
+
+    # picto command - Command that init a wizard to make a search
+    updater.dispatcher.add_handler(CommandHandler('pics',
+                                   commands.pictos.getPics))
+
     updater.dispatcher.add_handler(CommandHandler('translate',
                                                   commands.translate.translate,
                                                   pass_args=True))

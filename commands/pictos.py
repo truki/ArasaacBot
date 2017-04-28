@@ -56,3 +56,7 @@ def getPictosBW(bot, update, args):
                      parse_mode=telegram.ParseMode.HTML)
         bot.send_audio(chat_id=update.message.chat_id,
                        audio=picto['soundMP3URL'])
+
+
+def getPics(bot, update):
+    pass
