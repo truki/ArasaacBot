@@ -59,4 +59,11 @@ def getPictosBW(bot, update, args):
 
 
 def getPics(bot, update):
-    pass
+        # Fist stage choose Color, BW or both
+        keyboard = [[telegram.KeyboardButton("Color", callback_data='pics.color'),
+                     telegram.KeyboardButton("BW", callback_data='pics.bw'),
+                     telegram.KeyboardButton("Both", callback_data='pics.both')]]
+        bot.send_message(chat_id=update.message.chat_id,
+                     text="<b>Choose type of pictogram: </b>",
+                     reply_markup = telegram.ReplyKeyboardMarkup(keyboard),
+                     parse_mode=telegram.ParseMode.HTML)
