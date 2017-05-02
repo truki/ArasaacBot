@@ -59,11 +59,20 @@ def getPictosBW(bot, update, args):
 
 
 def getPics(bot, update):
-        # Fist stage choose Color, BW or both
-        keyboard = [[telegram.KeyboardButton("Color", callback_data='pics.color'),
-                     telegram.KeyboardButton("BW", callback_data='pics.bw'),
-                     telegram.KeyboardButton("Both", callback_data='pics.both')]]
-        bot.send_message(chat_id=update.message.chat_id,
+    # Fist stage choose Color, BW or both
+    keyboard = [[telegram.KeyboardButton("Color", callback_data='pics.color'),
+                 telegram.KeyboardButton("BW", callback_data='pics.bw'),
+                 telegram.KeyboardButton("Both", callback_data='pics.both')]]
+    bot.send_message(chat_id=update.message.chat_id,
                      text="<b>Choose type of pictogram: </b>",
                      reply_markup = telegram.ReplyKeyboardMarkup(keyboard),
                      parse_mode=telegram.ParseMode.HTML)
+
+
+def pics_color(bot, update):
+    query = update.callback_query
+    print(query)
+    # obtain callback_data that was sended between '.' character delimiter
+    data = query.data.split('.')
+    color = data[1]
+    print("Color: {}".format(color))

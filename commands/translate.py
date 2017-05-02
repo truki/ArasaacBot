@@ -20,3 +20,7 @@ def translate(bot, update, args):
                  text="wellcome, translate '"+str(args)+"?', choose the language:",
                  reply_markup = telegram.ReplyKeyboardMarkup(keyboard),
                  parse_mode=telegram.ParseMode.HTML)
+
+
+def language_callback(bot, update):
+    print("He pasado por language_callback")

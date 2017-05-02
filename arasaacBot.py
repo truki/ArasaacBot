@@ -78,6 +78,9 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_prev, pattern="inline.prev"))
     updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_next, pattern="inline.next"))
 
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_color, pattern="pics"))
+
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.language_callback, pattern="translate.language"))
 
     # init Bot
     updater.start_polling()
