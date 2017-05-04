@@ -17,14 +17,20 @@ Lists of commands you can use:
 
 ```/picsBW <word>```
 
+### pics
+
+```/pics <word>```
+
+Command that run a "wizard" where the user can contruct the query to search the word introduced guidely, pressing the buttons that will be appearing
+
 ### translate
 
-  ```/translate <text to translate>```
+  ```/translate <text to translate>```  WIP !!!!
 
 
 ## Inline Mode
 
-```@arasaacbot <word>```
+```@arasaacbot <word>``` WIP !!! INCOMPLETE
 
 
 ## Credits
