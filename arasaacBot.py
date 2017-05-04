@@ -81,6 +81,8 @@ def main():
     # CallbackQueryHandlers os /pics command 1º Choose color 2º Choose language
     updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_color, pattern="pics.color"))
     updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_language, pattern="pics.language"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_search, pattern="pics.search"))
+
 
 
     updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.language_callback, pattern="translate.language"))

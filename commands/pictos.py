@@ -70,6 +70,10 @@ def getPics(bot, update):
 
 
 def pics_color(bot, update):
+    '''
+    CallbackQueryHandler that handler the choice of the color, First stage of
+    /pics command
+    '''
 
     query = update.callback_query
     print(query)
@@ -94,7 +98,10 @@ def pics_color(bot, update):
 
 
 def pics_language(bot, update):
-
+    '''
+    CallbackQueryHandler that handler the choice of the labguage, Second stage
+    of /pics command
+    '''
     query = update.callback_query
     print(query)
     # obtain callback_data that was sended between '.' character delimiter
@@ -105,15 +112,41 @@ def pics_language(bot, update):
     print("Color: {}".format(color))
     print("Language: {}".format(language))
 
-    # Second stage after choose Color --> BW or both
-    keyboard = [[telegram.InlineKeyboardButton("ESP", callback_data='pics.language.es.'+color),
-                 telegram.InlineKeyboardButton("ENG", callback_data='pics.language.en.'+color),
-                 telegram.InlineKeyboardButton("FRE", callback_data='pics.language.fr.'+color)],
-                [telegram.InlineKeyboardButton("CAT", callback_data='pics.language.ca.'+color),
-                 telegram.InlineKeyboardButton("ITA", callback_data='pics.language.it.'+color),
-                 telegram.InlineKeyboardButton("GER", callback_data='pics.language.ge.'+color)
+    # Third stage after choose language, now choose kind of search
+    # (1-Begin in por 2-Contains 3-End on por 4-Exactly)
+    keyboard = [[telegram.InlineKeyboardButton("Start with", callback_data='pics.search.1.'+language+'.'+color),
+                 telegram.InlineKeyboardButton("Contains", callback_data='pics.search.2.'+language+'.'+color)],
+                [telegram.InlineKeyboardButton("End with", callback_data='pics.search.3.'+language+'.'+color),
+                 telegram.InlineKeyboardButton("Exactly", callback_data='pics.search.4.'+language+'.'+color)
                 ]]
     bot.send_message(chat_id=update.callback_query.message.chat_id,
-                     text="<b>Choose language: </b>",
+                     text="<b>Choose a search property: </b>",
                      reply_markup = telegram.InlineKeyboardMarkup(keyboard),
                      parse_mode=telegram.ParseMode.HTML)
+
+
+def pics_search(bot, update):
+    '''
+    CallbackQueryHandler that handler the choice of the search property, fourth
+    stage of /pics command.
+    After choice of search property we send API request to Arasaac Web API
+    '''
+    query = update.callback_query
+    print(query)
+    # obtain callback_data that was sended between '.' character delimiter
+    data = query.data.split('.')
+    # all query parameters
+    search = data[2]
+    language = data[3]
+    color = data[4]
+
+    print("Color: {}".format(color))
+    print("Language: {}".format(language))
+    if data[2] == '1':
+        print("Search: {}".format("Start with"))
+    elif data[2] == '2':
+        print("Search: {}".format("Contains"))
+    elif data[2] == '3':
+        print("Search: {}".format("End with"))
+    else:
+        print("Search: {}".format("Exactly"))
