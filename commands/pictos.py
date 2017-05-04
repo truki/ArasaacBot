@@ -60,19 +60,60 @@ def getPictosBW(bot, update, args):
 
 def getPics(bot, update):
     # Fist stage choose Color, BW or both
-    keyboard = [[telegram.InlineKeyboardButton("Color", callback_data='pics.color'),
-                 telegram.InlineKeyboardButton("BW", callback_data='pics.bw'),
-                 telegram.InlineKeyboardButton("Both", callback_data='pics.both')]]
+    keyboard = [[telegram.InlineKeyboardButton("Color", callback_data='pics.color.color'),
+                 telegram.InlineKeyboardButton("BW", callback_data='pics.color.bw'),
+                 telegram.InlineKeyboardButton("Both", callback_data='pics.color.both')]]
     bot.send_message(chat_id=update.message.chat_id,
                      text="<b>Choose type of pictogram: </b>",
-                     reply_markup = telegram.ReplyKeyboardMarkup(keyboard),
+                     reply_markup = telegram.InlineKeyboardMarkup(keyboard),
                      parse_mode=telegram.ParseMode.HTML)
 
 
 def pics_color(bot, update):
+
     query = update.callback_query
     print(query)
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
+    # Color specified
     color = data[1]
     print("Color: {}".format(color))
+
+    # Second stage after choose Color --> BW or both
+    keyboard = [[telegram.InlineKeyboardButton("ESP", callback_data='pics.language.es.'+color),
+                 telegram.InlineKeyboardButton("ENG", callback_data='pics.language.en.'+color),
+                 telegram.InlineKeyboardButton("FRE", callback_data='pics.language.fr.'+color)],
+                [telegram.InlineKeyboardButton("CAT", callback_data='pics.language.ca.'+color),
+                 telegram.InlineKeyboardButton("ITA", callback_data='pics.language.it.'+color),
+                 telegram.InlineKeyboardButton("GER", callback_data='pics.language.ge.'+color)
+                ]]
+    bot.send_message(chat_id=update.callback_query.message.chat_id,
+                     text="<b>Choose language: </b>",
+                     reply_markup = telegram.InlineKeyboardMarkup(keyboard),
+                     parse_mode=telegram.ParseMode.HTML)
+
+
+def pics_language(bot, update):
+
+    query = update.callback_query
+    print(query)
+    # obtain callback_data that was sended between '.' character delimiter
+    data = query.data.split('.')
+    # Color specified
+    language = data[2]
+    color = data[3]
+    print("Color: {}".format(color))
+    print("Language: {}".format(language))
+
+    # Second stage after choose Color --> BW or both
+    keyboard = [[telegram.InlineKeyboardButton("ESP", callback_data='pics.language.es.'+color),
+                 telegram.InlineKeyboardButton("ENG", callback_data='pics.language.en.'+color),
+                 telegram.InlineKeyboardButton("FRE", callback_data='pics.language.fr.'+color)],
+                [telegram.InlineKeyboardButton("CAT", callback_data='pics.language.ca.'+color),
+                 telegram.InlineKeyboardButton("ITA", callback_data='pics.language.it.'+color),
+                 telegram.InlineKeyboardButton("GER", callback_data='pics.language.ge.'+color)
+                ]]
+    bot.send_message(chat_id=update.callback_query.message.chat_id,
+                     text="<b>Choose language: </b>",
+                     reply_markup = telegram.InlineKeyboardMarkup(keyboard),
+                     parse_mode=telegram.ParseMode.HTML)
