@@ -7,12 +7,16 @@ import urllib3
 logger = logging.getLogger(__name__)
 
 
-def getPictosFromArasaac(url):
+def getPictosFromArasaac(query_url):
     '''
     Function that get an url with the API web request
     and return an array of json objects (answer)
     '''
-    print("URL request: {}".format(url))
+    http = config.httpPool()
+    req = http.request('GET', query_url)
+    data = json.loads(req.data.decode('utf-8'))
+    pictograms = data["symbols"]
+    return pictograms
 
 
 def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
@@ -48,7 +52,7 @@ def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
         query_bw_url += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
         pictograms_bw = getPictosFromArasaac(query_bw_url)
         # concatenate both array of pictograms
-        pictograms = pictogramas_color + pictogramas_bw
+        pictograms = pictograms_color + pictograms_bw
     else:
         if color == 'color':
             catalog = 'colorpictos'
@@ -142,7 +146,7 @@ def pics_color(bot, update):
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
     # Color specified
-    color = data[1]
+    color = data[2]
     print("Color: {}".format(color))
 
     # Second stage after choose Color --> BW or both
@@ -215,3 +219,4 @@ def pics_search(bot, update):
         print("Search: {}".format("Exactly"))
 
     pictograms = getPictosFromQuery(word, color, language, search)
+    print("PICTOGRAMS: {}".format(str(pictograms)))
