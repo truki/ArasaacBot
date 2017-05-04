@@ -65,7 +65,8 @@ def main():
 
     # picto command - Command that init a wizard to make a search
     updater.dispatcher.add_handler(CommandHandler('pics',
-                                   commands.pictos.getPics))
+                                   commands.pictos.getPics,
+                                   pass_args=True))
 
     updater.dispatcher.add_handler(CommandHandler('translate',
                                                   commands.translate.translate,
@@ -79,9 +80,10 @@ def main():
     updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_next, pattern="inline.next"))
 
     # CallbackQueryHandlers os /pics command 1º Choose color 2º Choose language
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_color, pattern="pics.color"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_language, pattern="pics.language"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.pics_search, pattern="pics.search"))
+    # 3º search property (start with, contains, end with and exactly)
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage1_color, pattern="pics.color"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage2_language, pattern="pics.language"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage3_search, pattern="pics.search"))
 
 
 
