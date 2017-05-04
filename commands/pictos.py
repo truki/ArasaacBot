@@ -6,6 +6,15 @@ import urllib3
 
 logger = logging.getLogger(__name__)
 
+
+def getPictosFromArasaac(url):
+    '''
+    Function that get an url with the API web request
+    and return an array of json objects (answer)
+    '''
+    print("URL request: {}".format(url))
+
+
 def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
     '''
     Functions that return an array of json objects with pictograms
@@ -20,21 +29,42 @@ def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
                 4- Descriptivos, 5- Contenido Social, 6-Miscelánea
     '''
     if color == 'both':
-        print("BOTH option selected!!!")
+        # contruct api request for pictograms on color catalog
+        catalog = 'colorpictos'
+        query_color_url = 'http://arasaac.org/api/index.php?callback=json'
+        query_color_url += '&language='+language
+        query_color_url += '&word='+word
+        query_color_url += '&catalog='+catalog+'&nresults='+str(nresults)+'&thumbnailsize=50'
+        query_color_url += '&TXTlocate='+search
+        query_color_url += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+        pictograms_color = getPictosFromArasaac(query_color_url)
+        # construct api request for pictograms on bw catalog
+        catalog = 'bwpictos'
+        query_bw_url = 'http://arasaac.org/api/index.php?callback=json'
+        query_bw_url += '&language='+language
+        query_bw_url += '&word='+word
+        query_bw_url += '&catalog='+catalog+'&nresults='+str(nresults)+'&thumbnailsize=50'
+        query_bw_url += '&TXTlocate='+search
+        query_bw_url += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+        pictograms_bw = getPictosFromArasaac(query_bw_url)
+        # concatenate both array of pictograms
+        pictograms = pictogramas_color + pictogramas_bw
     else:
         if color == 'color':
             catalog = 'colorpictos'
         else:
             catalog == 'bwpictos'
 
-        query = 'http://arasaac.org/api/index.php?callback=json'
-        query += '&language='+language
-        query += '&word='+word
-        query += '&catalog='+catalog+'&nresults='+str(nresults)+'&thumbnailsize=50'
-        query += '&TXTlocate='+search
-        query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+        query_url = 'http://arasaac.org/api/index.php?callback=json'
+        query_url += '&language='+language
+        query_url += '&word='+word
+        query_url += '&catalog='+catalog+'&nresults='+str(nresults)+'&thumbnailsize=50'
+        query_url += '&TXTlocate='+search
+        query_url += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
 
-        print("QUERY: {}".format(query))
+        pictograms = getPictosFromArasaac(query_url)
+
+    return pictograms
 
 def getPictosColor(bot, update, args):
     '''
