@@ -18,7 +18,7 @@ def translate(bot, update, args):
                  ]
     bot.send_message(chat_id=update.message.chat_id,
                  text="wellcome, translate '"+str(args)+"?', choose the language:",
-                 reply_markup = telegram.ReplyKeyboardMarkup(keyboard),
+                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
                  parse_mode=telegram.ParseMode.HTML)
 
 
