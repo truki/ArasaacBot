@@ -7,6 +7,7 @@ def start(bot, update):
     msg += "========================================\n"
     msg += "/picsColor word,... - List color pictograms that contains the words \n"
     msg += "/picsBW word - List BN pictograms that contains the word \n"
+    msg += "/pics word - Wizard to search pictograms that contains the word \n"
     msg += "\n"
     msg += "Translate into pictograms??: \n"
     msg += "========================================\n"

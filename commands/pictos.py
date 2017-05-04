@@ -6,6 +6,35 @@ import urllib3
 
 logger = logging.getLogger(__name__)
 
+def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
+    '''
+    Functions that return an array of json objects with pictograms
+    The API query is made of parameters defined in function declarations:
+    word:       word to search
+    color:      BW, color, both
+    language:   ES, EN, FR, CA, IT, GE
+    search:     1-start with, 2-contains, 3-end with, 4-Exactly
+    nresults:   num of result that return de query to web API, set to 500 by
+                default to get all the posibilities.
+    wordType:   1-Nombres propios, 2-Nombres Comunes, 3- Verbos,
+                4- Descriptivos, 5- Contenido Social, 6-Miscelánea
+    '''
+    if color == 'both':
+        print("BOTH option selected!!!")
+    else:
+        if color == 'color':
+            catalog = 'colorpictos'
+        else:
+            catalog == 'bwpictos'
+
+        query = 'http://arasaac.org/api/index.php?callback=json'
+        query += '&language='+language
+        query += '&word='+word
+        query += '&catalog='+catalog+'&nresults='+str(nresults)+'&thumbnailsize=50'
+        query += '&TXTlocate='+search
+        query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+
+        print("QUERY: {}".format(query))
 
 def getPictosColor(bot, update, args):
     '''
@@ -59,7 +88,10 @@ def getPictosBW(bot, update, args):
 
 
 def getPics(bot, update):
-    # Fist stage choose Color, BW or both
+    '''
+    Fist stage of /pics wizard choose Color, BW or both
+    '''
+
     keyboard = [[telegram.InlineKeyboardButton("Color", callback_data='pics.color.color'),
                  telegram.InlineKeyboardButton("BW", callback_data='pics.color.bw'),
                  telegram.InlineKeyboardButton("Both", callback_data='pics.color.both')]]
@@ -136,6 +168,7 @@ def pics_search(bot, update):
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
     # all query parameters
+    word ='barco'
     search = data[2]
     language = data[3]
     color = data[4]
@@ -150,3 +183,5 @@ def pics_search(bot, update):
         print("Search: {}".format("End with"))
     else:
         print("Search: {}".format("Exactly"))
+
+    pictograms = getPictosFromQuery(word, color, language, search)
