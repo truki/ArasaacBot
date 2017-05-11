@@ -16,12 +16,12 @@ def loadDatabaseConfiguration(name):
         logger.error("Error connecting to database: {}".format(name))
         exit(-1)
 
-def createBotBatabase(name):
+def createBotDatabase(name):
     try:
         conn = loadDatabaseConfiguration(name)
         c = conn.cursor()
-        c.execute('''CREATE TABLE IF NOT EXISTS inlines
-                     (word text, language text, pictos text, PRIMARY KEY (word, language) )''')
+        c.execute('''CREATE TABLE IF NOT EXISTS cache
+                     (word text, language text, pictos text, dateQuery text, PRIMARY KEY (word, language) )''')
         c.execute('''CREATE TABLE IF NOT EXISTS translations
                      (id int PRIMARY KEY, texToTranslate text)''')
         conn.commit()

@@ -1,4 +1,5 @@
 import ast
+import datetime
 import config
 import json
 import logging
@@ -25,7 +26,7 @@ def button_prev(bot, update):
         try:
             conn = config.loadDatabaseConfiguration("bot.sqlite3")
             c = conn.cursor()
-            c.execute('SELECT * FROM inlines WHERE word=? AND language=?', (word, language))
+            c.execute('SELECT * FROM cache WHERE word=? AND language=?', (word, language))
             pictos = c.fetchall()[0][2] #list of pictogrmas
             pictos = ast.literal_eval(pictos)
             print(pictos)
@@ -56,7 +57,7 @@ def button_next(bot, update):
     try:
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
-        c.execute('SELECT * FROM inlines WHERE word=? AND language=?', (word, language))
+        c.execute('SELECT * FROM cache WHERE word=? AND language=?', (word, language))
         pictos = c.fetchall()[0][2] #list of pictogrmas
         pictos = ast.literal_eval(pictos)
         print(pictos)
@@ -82,10 +83,13 @@ def insertPictosDatabase(word, language, pictos):
     | ball  |[{picto1},...{picton}] |
     '''
 
+    date_query = datetime.datetime.now().strftime(format='%D, %H:%M %P')
+    print("DATE: {}".format(date_query))
+
     try:
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
-        c.execute("INSERT INTO inlines (word, language, pictos) VALUES (?, ?, ?)",(word, language, str(pictos)))
+        c.execute("INSERT INTO cache (word, language, pictos, dateQuery) VALUES (?, ?, ?, ?)",(word, language, str(pictos), date_query))
         logger.info("inline query of {} has been inserted".format(word))
         conn.commit()
     except:
