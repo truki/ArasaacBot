@@ -84,7 +84,6 @@ def insertPictosDatabase(word, language, pictos):
     '''
 
     date_query = datetime.datetime.now().strftime(format='%D, %H:%M %P')
-    print("DATE: {}".format(date_query))
 
     try:
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
@@ -98,22 +97,57 @@ def insertPictosDatabase(word, language, pictos):
         conn.close()
 
 
-def getListPictos(language, word):
+def existsInCacheAndValid(language, word):
+    try:
+        conn = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn.cursor()
+        c.execute('SELECT * FROM cache WHERE word=? AND language=?', (word, language))
+        pictos = c.fetchall()
+        print("X_X_X_X_X_X_X_XX_X_X_X_X_ ----->{}".format(pictos))
+        if len(pictos)>0:
+            logger.info("CACHE: YEAH Caching!!! {}".format(pictos))
+            pictos = pictos[0][2] #list of pictogrmas
+            logger.info("CACHE: YEAH Caching!!! After Caching 1 {}".format(pictos))
+            pictos = ast.literal_eval(pictos)
+            logger.info("CACHE: YEAH Caching!!! After Caching 2 {}".format(pictos))
+        else:
+            logger.info("CACHE: Uppss not cached, new!!!")
+    except:
+        logger.error("Error searching in cache table database {0} word in {1} language".format(word, language))
+    finally:
+        conn.close()
+
+    return pictos
+
+
+def getListPictos(language, word, force=False):
     '''
-    Function that return que API query on a list compound by list of
-    JSON objects
+    Function that return list of JSON objects (pictograms)
     '''
 
-    query = 'http://arasaac.org/api/index.php?callback=json'
-    query += '&language='+language
-    query += '&word='+word
-    query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
-    query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
-    logger.info("/getPicsColor QUERY: {}".format(query))
-    http = config.httpPool()
-    req = http.request('GET', query)
-    datos= json.loads(req.data.decode('utf-8'))
-    pictos = datos["symbols"]
+    pictos = []
+    print("pictos antes: {}".format(pictos))
+
+    # if force is not true, lookfor in cache
+    if not(force):
+        pictos = existsInCacheAndValid(language, word)
+
+    print("pictos despues: {}".format(pictos))
+    # if the return from cache is empty or force is true, send the request
+    if len(pictos)<1 or force:
+        query = 'http://arasaac.org/api/index.php?callback=json'
+        query += '&language='+language
+        query += '&word='+word
+        query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
+        query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+        logger.info("/getPicsColor QUERY: {}".format(query))
+        http = config.httpPool()
+        req = http.request('GET', query)
+        datos= json.loads(req.data.decode('utf-8'))
+        pictos = datos["symbols"]
+        if len(pictos) > 0:
+            insertPictosDatabase(word, language, pictos)
+
     return pictos
 
 def getPictoOnList(list, pos):
@@ -143,11 +177,8 @@ def pictoInline(bot, update):
         in otherwise if the len >= 1 insert de query in inlines tables
         '''
         if len(picto_list) < 2:
-            if len(picto_list) > 0:
-                insertPictosDatabase(picto_list[0]['name'], language, picto_list)
             return None
         else:
-            insertPictosDatabase(picto_list[0]['name'], language, picto_list)
             keyboard = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.0.'+picto_list[0]['name']+'.'+language),
                          telegram.InlineKeyboardButton("Next >", callback_data='inline.next.0.'+picto_list[0]['name']+'.'+language)]]
             return telegram.InlineKeyboardMarkup(keyboard)
