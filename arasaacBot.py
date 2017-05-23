@@ -76,9 +76,6 @@ def main():
 
     updater.dispatcher.add_handler(InlineQueryHandler(inline.pictoInline.pictoInline))
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_prev, pattern="inline.prev"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(inline.pictoInline.button_next, pattern="inline.next"))
-
     # CallbackQueryHandlers os /pics command 1º Choose color 2º Choose language
     # 3º search property (start with, contains, end with and exactly)
     updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage1_color, pattern="pics.color"))

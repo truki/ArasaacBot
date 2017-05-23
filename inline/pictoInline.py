@@ -9,71 +9,6 @@ import urllib3
 logger = logging.getLogger(__name__)
 
 
-def button_prev(bot, update):
-    query = update.callback_query
-    print(query)
-    # obtain callback_data that was sended between '.' delimiter
-    data = query.data.split('.')
-    pos = int(data[2])
-    print(pos)
-    word = data[3]
-    print(word)
-    language = data[4]
-    print(language)
-
-    if pos > 0:
-
-        try:
-            conn = config.loadDatabaseConfiguration("bot.sqlite3")
-            c = conn.cursor()
-            c.execute('SELECT * FROM cache WHERE word=? AND language=?', (word, language))
-            pictos = c.fetchall()[0][2] #list of pictogrmas
-            pictos = ast.literal_eval(pictos)
-            print(pictos)
-        except:
-            logger.error("Error en la consulta de la palabra {} en el idioma {}".format(word, language))
-        finally:
-            conn.close()
-        pos = pos - 1
-        reply_markup = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.'+str(pos)+'.'+word+'.'+language),
-                     telegram.InlineKeyboardButton("Next >", callback_data='inline.next.'+str(pos)+'.'+word+'.'+language)]]
-        bot.editMessageText(text='<a href="'+pictos[pos]['imagePNGURL']+'">'+pictos[pos]['name']+'</a>'+'\n\n',
-                            inline_message_id=query.inline_message_id,
-                            parse_mode="HTML",
-                            reply_markup = telegram.InlineKeyboardMarkup(reply_markup))
-
-def button_next(bot, update):
-    query = update.callback_query
-    print(query)
-    # obtain callback_data that was sended between '.' delimiter
-    data = query.data.split('.')
-    pos = int(data[2])
-    print(pos)
-    word = data[3]
-    print(word)
-    language = data[4]
-    print(language)
-
-    try:
-        conn = config.loadDatabaseConfiguration("bot.sqlite3")
-        c = conn.cursor()
-        c.execute('SELECT * FROM cache WHERE word=? AND language=?', (word, language))
-        pictos = c.fetchall()[0][2] #list of pictogrmas
-        pictos = ast.literal_eval(pictos)
-        print(pictos)
-    except:
-        logger.error("Error en la consulta de la palabra {} en el idioma {}".format(word, language))
-    finally:
-        conn.close()
-    pos = pos + 1
-
-    reply_markup = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.'+str(pos)+'.'+word+'.'+language),
-                 telegram.InlineKeyboardButton("Next >", callback_data='inline.next.'+str(pos)+'.'+word+'.'+language)]]
-
-    bot.editMessageText(text='<a href="'+pictos[pos]['imagePNGURL']+'">'+pictos[pos]['name']+'</a>'+'\n\n',
-                        inline_message_id=query.inline_message_id,
-                        parse_mode="HTML",
-                        reply_markup = telegram.InlineKeyboardMarkup(reply_markup))
 
 def insertPictosDatabase(word, language, pictos):
     '''
@@ -163,75 +98,75 @@ def getPictoOnList(list, pos):
 
     return text
 
-
 def pictoInline(bot, update):
     query = update.inline_query.query
     if not query:
         return
 
-    def check_reply_markup(picto_list, language):
-        '''
-        Function that check if the number of pictos is greater than 1
-            yes: create an inline keybord with prev and next buttons
-            no: dont create
-        in otherwise if the len >= 1 insert de query in inlines tables
-        '''
-        if len(picto_list) < 2:
-            return None
-        else:
-            keyboard = [[telegram.InlineKeyboardButton(" < Prev", callback_data='inline.prev.0.'+picto_list[0]['name']+'.'+language),
-                         telegram.InlineKeyboardButton("Next >", callback_data='inline.next.0.'+picto_list[0]['name']+'.'+language)]]
-            return telegram.InlineKeyboardMarkup(keyboard)
-
     results = list()
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='0',
-            title='Spanish',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('ES', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('ES', query), 'ES')
-        )
-    )
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='1',
-            title='English',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('EN', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('EN', query), 'EN')
-        )
-    )
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='2',
-            title='French',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('FR', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('FR', query), 'FR')
-        )
-    )
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='3',
-            title='Catalan',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('CA', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('CA', query), 'CA')
-        )
-    )
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='4',
-            title='Italian',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('IT', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('IT', query), 'IT')
+    picto_list = getListPictos('ES', query, force="false")
 
+    for picto in picto_list:
+        results.append(
+            telegram.InlineQueryResultArticle(id=picto_list.index(picto),
+                                              title=picto['name'],
+                                              input_message_content=telegram.InputTextMessageContent(picto['imagePNGURL'])
+            )
         )
-    )
-    results.append(
-        telegram.InlineQueryResultArticle(
-            id='5',
-            title='German',
-            input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('GE', query), 0), parse_mode="HTML", disable_web_page_preview=False),
-            reply_markup=check_reply_markup(getListPictos('GE', query), 'GE')
-        )
-    )
-    logger.info(results)
+
     bot.answerInlineQuery(update.inline_query.id, results)
+
+# def pictoInline(bot, update):
+#
+#     results = list()
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='0',
+#             title='Spanish',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('ES', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('ES', query), 'ES')
+#         )
+#     )
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='1',
+#             title='English',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('EN', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('EN', query), 'EN')
+#         )
+#     )
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='2',
+#             title='French',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('FR', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('FR', query), 'FR')
+#         )
+#     )
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='3',
+#             title='Catalan',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('CA', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('CA', query), 'CA')
+#         )
+#     )
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='4',
+#             title='Italian',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('IT', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('IT', query), 'IT')
+#
+#         )
+#     )
+#     results.append(
+#         telegram.InlineQueryResultArticle(
+#             id='5',
+#             title='German',
+#             input_message_content=telegram.InputTextMessageContent(getPictoOnList(getListPictos('GE', query), 0), parse_mode="HTML", disable_web_page_preview=False),
+#             reply_markup=check_reply_markup(getListPictos('GE', query), 'GE')
+#         )
+#     )
+#     logger.info(results)
+#     bot.answerInlineQuery(update.inline_query.id, results)

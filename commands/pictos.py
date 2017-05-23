@@ -2,7 +2,6 @@ import config
 import json
 import logging
 import telegram
-import urllib3
 
 logger = logging.getLogger(__name__)
 
