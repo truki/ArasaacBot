@@ -55,7 +55,7 @@ def existsInCacheAndValid(language, word):
     return pictos
 
 
-def getListPictos(language, word, force=False):
+def getListPictos(languages, word, force=False):
     '''
     Function that return list of JSON objects (pictograms)
     '''
@@ -64,25 +64,26 @@ def getListPictos(language, word, force=False):
     print("pictos antes: {}".format(pictos))
 
     # if force is not true, lookfor in cache
-    if not(force):
-        pictos = existsInCacheAndValid(language, word)
+    for lang in languages:
+        if not(force):
+            pictos = existsInCacheAndValid(lang, word)
 
-    print("pictos despues: {}".format(pictos))
-    # if the return from cache is empty or force is true, send the request
-    if len(pictos)<1 or force:
-        query = 'http://arasaac.org/api/index.php?callback=json'
-        query += '&language='+language
-        query += '&word='+word
-        query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
-        query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
-        logger.info("/getPicsColor QUERY: {}".format(query))
-        http = config.httpPool()
-        req = http.request('GET', query)
-        datos= json.loads(req.data.decode('utf-8'))
-        pictos = datos["symbols"]
-        if len(pictos) > 0:
-            insertPictosDatabase(word, language, pictos)
-
+        print("pictos despues de {0}: {1}".format(lang, pictos))
+        # if the return from cache is empty or force is true, send the request
+        if len(pictos)<1 or force:
+            query = 'http://arasaac.org/api/index.php?callback=json'
+            query += '&language='+lang
+            query += '&word='+word
+            query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
+            query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+            logger.info("/getPicsColor QUERY: {}".format(query))
+            http = config.httpPool()
+            req = http.request('GET', query)
+            datos = json.loads(req.data.decode('utf-8'))
+            pictos_temp = datos["symbols"]
+            if len(pictos_temp) > 0:
+                insertPictosDatabase(word, lang, pictos_temp)
+            pictos += pictos_temp
     return pictos
 
 def getPictoOnList(list, pos):
@@ -104,12 +105,15 @@ def pictoInline(bot, update):
         return
 
     results = list()
-    picto_list = getListPictos('ES', query, force="false")
+    picto_list = getListPictos(['ES','EN','FR','IT','DE','CA'], query, force="false")
 
     for picto in picto_list:
         results.append(
-            telegram.InlineQueryResultArticle(id=picto_list.index(picto),
+            telegram.InlineQueryResultPhoto(id=picto_list.index(picto),
                                               title=picto['name'],
+                                              photo_url=picto['imagePNGURL'],
+                                              thumb_url=picto['thumbnailURL'],
+                                              caption=picto['name'],
                                               input_message_content=telegram.InputTextMessageContent(picto['imagePNGURL'])
             )
         )
