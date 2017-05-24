@@ -55,35 +55,48 @@ def existsInCacheAndValid(language, word):
     return pictos
 
 
+
+def getPictos(lang, word, force=False):
+    '''
+    Function that return a list of pictos in a specific languages
+    '''
+    pictos = []
+    if not(force):
+        pictos = existsInCacheAndValid(lang, word)
+
+    # if the return from cache is empty or force is true, send the request
+    if len(pictos)<1 or force:
+        query = 'http://arasaac.org/api/index.php?callback=json'
+        query += '&language='+lang
+        query += '&word='+word
+        query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
+        query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+        http = config.httpPool()
+        req = http.request('GET', query)
+        datos = json.loads(req.data.decode('utf-8'))
+        pictos_temp = datos["symbols"]
+        if len(pictos_temp) > 0:
+            insertPictosDatabase(word, lang, pictos_temp)
+        pictos = pictos_temp
+    return pictos
+
 def getListPictos(languages, word, force=False):
     '''
     Function that return list of JSON objects (pictograms)
+    parameters:
+        - languages: list of languages.
+        - word: word to search
+        - force: if true, force to update cache if the entry exist
+    Call another function with threads that return another list of pictos
+    for a specific language "getPictos"
     '''
 
     pictos = []
-    print("pictos antes: {}".format(pictos))
 
     # if force is not true, lookfor in cache
     for lang in languages:
-        if not(force):
-            pictos = existsInCacheAndValid(lang, word)
+        pictos += getPictos(lang, word, force)
 
-        print("pictos despues de {0}: {1}".format(lang, pictos))
-        # if the return from cache is empty or force is true, send the request
-        if len(pictos)<1 or force:
-            query = 'http://arasaac.org/api/index.php?callback=json'
-            query += '&language='+lang
-            query += '&word='+word
-            query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
-            query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
-            logger.info("/getPicsColor QUERY: {}".format(query))
-            http = config.httpPool()
-            req = http.request('GET', query)
-            datos = json.loads(req.data.decode('utf-8'))
-            pictos_temp = datos["symbols"]
-            if len(pictos_temp) > 0:
-                insertPictosDatabase(word, lang, pictos_temp)
-            pictos += pictos_temp
     return pictos
 
 def getPictoOnList(list, pos):
