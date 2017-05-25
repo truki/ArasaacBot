@@ -6,6 +6,8 @@ import logging
 import telegram
 import urllib3
 
+from multiprocessing.pool import ThreadPool
+
 logger = logging.getLogger(__name__)
 
 
@@ -92,12 +94,22 @@ def getListPictos(languages, word, force=False):
     '''
 
     pictos = []
+    pictos_temp = []
+    pool = ThreadPool(len(languages))
 
     # if force is not true, lookfor in cache
     for lang in languages:
-        pictos += getPictos(lang, word, force)
+        pictos_temp.append(pool.apply_async(getPictos, args=(lang, word, force)))
 
+    pool.close()
+    pool.join()
+    print("Pictos: {}".format(pictos_temp))
+    print("GET: {}".format(pictos_temp[0].get()))
+    for p in pictos_temp:
+        pictos += p.get()
+    print("Pictos_after: {}".format(pictos))
     return pictos
+
 
 def getPictoOnList(list, pos):
     '''

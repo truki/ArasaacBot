@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Bot that interact with Araasac API to retrieve resources
 Developer: @trukise
