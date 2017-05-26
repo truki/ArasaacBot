@@ -32,6 +32,23 @@ def insertTranslation(text, language=""):
         conn.close()
 
 
+def insertWordsToTranslationsDetails(text_to_translate, language,
+                                     id_translation):
+    for word in text_to_translate:
+        try:
+            pictos = []
+            conn = config.loadDatabaseConfiguration("bot.sqlite3")
+            c = conn.cursor()
+            c.execute("INSERT INTO translations_details (idtranslation, language, pictos) VALUES (?, ?, ?)", (id_translation, word, pictos))
+            logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
+            conn.commit()
+        except:
+            logger.error("Error inserting on translations_details")
+        finally:
+            if conn:
+                conn.close()
+
+
 
 def translate(bot, update, args):
     '''
@@ -45,7 +62,7 @@ def translate(bot, update, args):
     print("User: {}".format(str(update.message.from_user.id)))
 
     # Fist stage the user must to choose the language
-    keyboard = [[telegram.InlineKeyboardButton("Español", callback_data='trans.lang.ES.'+str(id_translation)),
+    keyboard = [[telegram.InlineKeyboardButton("Español", scallback_data='trans.lang.ES.'+str(id_translation)),
                  telegram.InlineKeyboardButton("English", callback_data='trans.lang.EN.'+str(id_translation)),
                  telegram.InlineKeyboardButton("French", callback_data='trans.lang.FR.'+str(id_translation))],
                 [telegram.InlineKeyboardButton("Italian", callback_data='trans.lang.IT.'+str(id_translation)),
@@ -102,7 +119,8 @@ def translate_stage1_language_callback(bot, update):
         logger.error("An error occur while querying for an specified translation id")
     finally:
         conn.close()
-    
+
+    insertWordsToTranslationsDetails(translation, language, id)
 
     # making the keyboard with all words that has pictograms
     keyboard = []
