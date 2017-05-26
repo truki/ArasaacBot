@@ -150,13 +150,13 @@ def getPics_stage1_color(bot, update):
     '''
 
     query = update.callback_query
-    print("CALLBACKQUERY {}".format(query))
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
     # Color specified
     color = data[2]
+    #word specified
     word = data[3]
-    print("Color: {}".format(color))
+
 
     # Second stage after choose Color --> BW or both
     keyboard = [[telegram.InlineKeyboardButton("ESP", callback_data='pics.language.ES.'+color+'.'+word),

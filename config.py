@@ -23,12 +23,16 @@ def createBotDatabase(name):
         c.execute('''CREATE TABLE IF NOT EXISTS cache
                      (word text, language text, pictos text, dateQuery text, PRIMARY KEY (word, language) )''')
         c.execute('''CREATE TABLE IF NOT EXISTS translations
-                     (id int PRIMARY KEY, texToTranslate text)''')
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, texToTranslate text, language text)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS translations_details
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, idtranslation INTEGER, word text, pictos text)''')
         conn.commit()
         conn.close()
-    except:
-        logger.error("Error creating tables on database {}".format(name))
-
+    except sqlite3.Error as e:
+        logger.error("Error creating tables on database {}".format(e.args[0]))
+    finally:
+        if conn:
+            conn.close()
 
 def loadArasaacApiKey(araasacApiKeyFile):
     '''
