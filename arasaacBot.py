@@ -86,6 +86,8 @@ def main():
 
 
     updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage1_language_callback, pattern="trans.lang"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage2_word_callback, pattern="trans.word"))
+
 
     # init Bot
     updater.start_polling()
