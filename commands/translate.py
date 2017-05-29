@@ -34,9 +34,28 @@ def insertTranslation(text, language=""):
     finally:
         conn.close()
 
-def getAndInsertWords(id_translation, word, position):
+
+def getPictosFromArasaacAPI(language, word):
+
+    pictos = []
+
+    query = 'http://arasaac.org/api/index.php?callback=json'
+    query += '&language='+language
+    query += '&word='+word
+    query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
+    query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+    http = config.httpPool()
+    req = http.request('GET', query)
+    datos = json.loads(req.data.decode('utf-8'))
+    pictos_temp = datos["symbols"]
+    pictos = pictos_temp
+
+    return pictos
+
+
+def getAndInsertWords(id_translation, language, word, position):
     try:
-        pictos = []
+        pictos = getPictosFromArasaacAPI(language, word)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
         c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
@@ -53,7 +72,7 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
     pool = ThreadPool(len(text_to_translate))
     for word in text_to_translate:
         position = text_to_translate.index(word)
-        pool.apply_async(getAndInsertWords, args=(id_translation, word, position))
+        pool.apply_async(getAndInsertWords, args=(id_translation, language, word, position))
         text_to_translate[text_to_translate.index(word)] = ""
 
 def translate(bot, update, args):
