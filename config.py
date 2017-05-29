@@ -25,7 +25,7 @@ def createBotDatabase(name):
         c.execute('''CREATE TABLE IF NOT EXISTS translations
                      (id INTEGER PRIMARY KEY AUTOINCREMENT, texToTranslate text, language text)''')
         c.execute('''CREATE TABLE IF NOT EXISTS translations_details
-                     (id INTEGER PRIMARY KEY AUTOINCREMENT, idtranslation INTEGER, word text, pictos text)''')
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, idtranslation INTEGER, word text, position INTEGER, pictos text)''')
         conn.commit()
         conn.close()
     except sqlite3.Error as e:

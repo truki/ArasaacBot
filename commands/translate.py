@@ -34,12 +34,31 @@ def insertTranslation(text, language=""):
     finally:
         conn.close()
 
-def getAndInsertWords(id_translation, word):
+
+def getPictosFromArasaacAPI(language, word):
+
+    pictos = []
+
+    query = 'http://arasaac.org/api/index.php?callback=json'
+    query += '&language='+language
+    query += '&word='+word
+    query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
+    query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
+    http = config.httpPool()
+    req = http.request('GET', query)
+    datos = json.loads(req.data.decode('utf-8'))
+    pictos_temp = datos["symbols"]
+    pictos = pictos_temp
+
+    return pictos
+
+
+def getAndInsertWords(id_translation, language, word, position):
     try:
-        pictos = []
+        pictos = getPictosFromArasaacAPI(language, word)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
-        c.execute("INSERT INTO translations_details (idtranslation, word, pictos) VALUES (?, ?, ?)", (id_translation, word, str(pictos)))
+        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
     except sqlite3.Error as e:
@@ -50,7 +69,6 @@ def getAndInsertWords(id_translation, word):
 
 def insertWordsToTranslationsDetails(text_to_translate, language,
                                      id_translation):
-
     conn = config.loadDatabaseConfiguration("bot.sqlite3")
     c = conn.cursor()
     c.execute('SELECT * FROM translations_details WHERE idtranslation= ?', (id_translation,))
@@ -59,7 +77,9 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
     if len(translation_result)==0:
         pool = ThreadPool(len(text_to_translate))
         for word in text_to_translate:
-            pool.apply_async(getAndInsertWords, args=(id_translation, word))
+            position = text_to_translate.index(word)
+            pool.apply_async(getAndInsertWords, args=(id_translation, language, word, position))
+            text_to_translate[text_to_translate.index(word)] = ""
 
 
 def translate(bot, update, args):
