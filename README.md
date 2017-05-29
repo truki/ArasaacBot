@@ -1,4 +1,4 @@
-![Arasaac Logo](images/arasaac_hd.png)
+![Arasaac Logo](images/arasaacBot_hd.png)
 
 # ArasaacBot
 
