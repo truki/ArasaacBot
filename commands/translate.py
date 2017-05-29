@@ -50,10 +50,16 @@ def getAndInsertWords(id_translation, word):
 
 def insertWordsToTranslationsDetails(text_to_translate, language,
                                      id_translation):
-    pool = ThreadPool(len(text_to_translate))
 
-    for word in text_to_translate:
-        pool.apply_async(getAndInsertWords, args=(id_translation, word))
+    conn = config.loadDatabaseConfiguration("bot.sqlite3")
+    c = conn.cursor()
+    c.execute('SELECT * FROM translations_details WHERE idtranslation= ?', (id_translation,))
+    translation_result = c.fetchall()
+    conn.close()
+    if len(translation_result)==0:
+        pool = ThreadPool(len(text_to_translate))
+        for word in text_to_translate:
+            pool.apply_async(getAndInsertWords, args=(id_translation, word))
 
 
 def translate(bot, update, args):
