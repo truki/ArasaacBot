@@ -34,12 +34,12 @@ def insertTranslation(text, language=""):
     finally:
         conn.close()
 
-def getAndInsertWords(id_translation, word):
+def getAndInsertWords(id_translation, word, position):
     try:
         pictos = []
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
-        c.execute("INSERT INTO translations_details (idtranslation, word, pictos) VALUES (?, ?, ?)", (id_translation, word, str(pictos)))
+        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
     except sqlite3.Error as e:
@@ -51,10 +51,10 @@ def getAndInsertWords(id_translation, word):
 def insertWordsToTranslationsDetails(text_to_translate, language,
                                      id_translation):
     pool = ThreadPool(len(text_to_translate))
-
     for word in text_to_translate:
-        pool.apply_async(getAndInsertWords, args=(id_translation, word))
-
+        position = text_to_translate.index(word)
+        pool.apply_async(getAndInsertWords, args=(id_translation, word, position))
+        text_to_translate[text_to_translate.index(word)] = ""
 
 def translate(bot, update, args):
     '''
