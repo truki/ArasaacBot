@@ -36,7 +36,11 @@ def insertTranslation(text, language=""):
 
 
 def getPictosFromArasaacAPI(language, word):
-
+    '''
+    Functions that construct a http query for Arasaac API with a word and a
+    language.
+    TXTLocate=Exactly matching.
+    '''
     pictos = []
 
     query = 'http://arasaac.org/api/index.php?callback=json'
@@ -54,10 +58,20 @@ def getPictosFromArasaacAPI(language, word):
 
 
 def getAndInsertWords(id_translation, language, word, position):
+    '''
+    Functions that insert (YES now insert) a word of a translation into
+    translations_details table.
+    Call another function (getPictosFromArasaacAPI) to get pictos field
+    (a list with all pictograms objects returned by querying Arasaac API
+    with a word and a language)
+    '''
+
     try:
+        # Get pictos from Arasaac
         pictos = getPictosFromArasaacAPI(language, word)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
+        # insert into translations_details
         c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
@@ -69,12 +83,19 @@ def getAndInsertWords(id_translation, language, word, position):
 
 def insertWordsToTranslationsDetails(text_to_translate, language,
                                      id_translation):
+    '''
+    Functions that call another function to insert all words to
+    translations_details table. Run a thread per word
+    IMPORTANT: the order (because we use threads) that we insert into table
+    perhaps is not the same that the words appearing in the phrase
+    '''
+
     conn = config.loadDatabaseConfiguration("bot.sqlite3")
     c = conn.cursor()
     c.execute('SELECT * FROM translations_details WHERE idtranslation= ?', (id_translation,))
     translation_result = c.fetchall()
     conn.close()
-    if len(translation_result)==0:
+    if len(translation_result)==0:      # cheack if exist
         pool = ThreadPool(len(text_to_translate))
         for word in text_to_translate:
             position = text_to_translate.index(word)
@@ -85,6 +106,9 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
 def translate(bot, update, args):
     '''
     Command used to translate a little text to pictograms
+    Use: /translate <text to translate>
+    Output: An image with a translation and buttons to changes pictograms
+    if this is possible
     '''
 
     #print("Message : {}".format(update.message))
@@ -102,6 +126,8 @@ def translate(bot, update, args):
                  ]
     print("id_translation: {}".format(str(id_translation)))
 
+    # Send message with text to translate and with a keyboard with
+    # all languages options
     bot.send_message(chat_id=update.message.chat_id,
                  text="wellcome, translate "+str(args)+"?, choose the language:",
                  reply_markup = telegram.InlineKeyboardMarkup(keyboard),
@@ -139,6 +165,7 @@ def translate_stage1_language_callback(bot, update):
                 c = conn_update.cursor()
                 c.execute('''UPDATE translations SET language = ? WHERE id = ?''', (language,id))
                 conn_update.commit()
+                logger.info("Translation updated with language: {}".format(language))
                 conn_update.close()
             except sqlite3.Error as e:
                 logger.error("An error occurr updating an specified translation id: {} with a language: {}".format(str(id), language))
@@ -153,7 +180,10 @@ def translate_stage1_language_callback(bot, update):
     finally:
         conn.close()
 
-    insertWordsToTranslationsDetails(translation, language, id)
+    # After update with the language, inserts all the words into
+    # translations_details table
+    translation_copy = list(translation)
+    insertWordsToTranslationsDetails(translation_copy, language, id)
 
     # making the keyboard with all words that has pictograms
     keyboard = []
@@ -163,7 +193,9 @@ def translate_stage1_language_callback(bot, update):
 
     keyboard.append(keys)
 
-
+    # Send message with (image in the future) and with the buttons
+    # that could change every words that can be change (have more than one
+    # pictograms available)
     bot.send_message(chat_id=query.message.chat_id,
                  text="Choose the word button to change pictograms",
                  reply_markup = telegram.InlineKeyboardMarkup(keyboard),
