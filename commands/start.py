@@ -3,31 +3,31 @@ def start(bot, update):
     msg = "Hello {user_name}! I'm {bot_name}. \n"
     msg += "What would you like to do? \n"
     msg += "\n"
-    msg += "Get Pictograms??: \n"
+    msg += "*Get Pictograms??:* \n"
     msg += "========================================\n"
-    msg += "/picsColor word,... - List color pictograms that contains the words \n"
-    msg += "/picsBW word - List BN pictograms that contains the word \n"
-    msg += "/pics word - Wizard to search pictograms that contains the word \n"
+    msg += "/picsColor _<word>_ - List color pictograms that contains the word \n"
+    msg += "/picsBW _<word>_ - List BN pictograms that contains the word \n"
+    msg += "/pics _<word>_ - Wizard to search pictograms that contains the word \n"
     msg += "\n"
-    msg += "Translate into pictograms??: \n"
+    msg += "*Translate into pictograms??:* \n"
     msg += "========================================\n"
-    msg += "/translate - translate to pictograms the text specified, limit: 10 words \n"
+    msg += "/translate _<words>_ - translate to pictograms the text specified, limit: 5 words \n"
     msg += "\n"
-    msg += "Inline mode: \n"
+    msg += "*Inline mode:* \n"
     msg += "========================================\n"
-    msg += "@arasaacbot <word> - After a time, you must to choose a language, \n"
-    msg += "and then you will see a pictogram that contains the word. Then \n"
-    msg += "you can navigate with '< prev' and 'next >' buttons if the search \n"
-    msg += "has more than one pictogram \n"
+    msg += "@arasaacbot _<word>_ - After a few seconds you can see a set \n"
+    msg += "of thumbnails of pictograms that match the word exactly with \n"
+    msg += "the text of them \n"
     msg += "\n"
-    msg += "Other commands: \n"
+    msg += "*Other commands:* \n"
     msg += "========================================\n"
     msg += "/about - shows about me information"
 
     # Send the message
     bot.sendPhoto(chat_id=update.message.chat_id,
-                  photo=open('images/arasaac_hd_boy_100x100.png', 'rb'))
+                  photo=open('images/ArasaacBot_icon_100x100.png', 'rb'))
     bot.send_message(chat_id=update.message.chat_id,
                      text=msg.format(
                          user_name=update.message.from_user.first_name,
-                         bot_name=bot.name))
+                         bot_name=bot.name),
+                    parse_mode="Markdown")
