@@ -32,3 +32,13 @@ def makePictoText(text, width=500, height=500, background_color="white",
     filename = "pictoText_"+text+".png"
     # saving the image
     img.save(filename)
+
+
+
+def joinPictos(list_of_pictos):
+    '''
+    Function that receive a list of pictos (filenames) in an order
+    and return a image where all pitograms in the list given are together
+    Function used to return the result of a translation
+    '''
+    pass
