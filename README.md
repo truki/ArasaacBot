@@ -30,7 +30,7 @@ Command that run a "wizard" where the user can contruct the query to search the 
 
 ## Inline Mode
 
-```@arasaacbot <word>``` WIP !!! INCOMPLETE
+```@arasaacbot <word>```
 
 
 ## Credits
