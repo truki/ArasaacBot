@@ -35,10 +35,26 @@ def makePictoText(text, width=500, height=500, background_color="white",
 
 
 
-def joinPictos(list_of_pictos):
+def joinPictos(list_of_pictos, texto):
     '''
     Function that receive a list of pictos (filenames) in an order
     and return a image where all pitograms in the list given are together
     Function used to return the result of a translation
     '''
-    pass
+
+    images = map(Image.open, list_of_pictos)
+    widths, heights = zip(*(i.size for i in images))
+
+    total_width = sum(widths)
+    max_heigth = max(heights)
+
+    new_image = Image.new('RGB', (total_width, max_heigth))
+
+    x_offset = 0
+    for im in images:
+        new_image.paste(im, (x_offset,0))
+        x_offset += im.size[0]
+    filename = texto + '.png'
+    new_image.sav(filename)
+
+    
