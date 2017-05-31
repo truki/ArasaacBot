@@ -1,7 +1,7 @@
 from PIL import Image, ImageFont, ImageDraw
 
 def makePictoText(text, width=500, height=500, background_color="white",
-                  font_type="Arial", font_size=72, font_color="black"):
+                  font_type="Arial", font_size=96, font_color="black"):
     '''
     Function that make a pictogram with a background color, and with
     a text inside
