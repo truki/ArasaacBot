@@ -9,11 +9,11 @@ def makePictoText(text, width=500, height=500, background_color="white",
     Function that make a pictogram with a background color, and with
     a text inside
     size = (width, high)
-    '''
+        '''
     # tuple with size of pictogram
     size_picto = (width, height)
     # make a picto with white background color with Image constructor
-    img = Image.new('RGB', size_picto, background_color)
+    img = Image.new('RGBA', size_picto, background_color)
     # create a draw object to paint on the imagee
     draw = ImageDraw.Draw(img)
     # create a text object that will be inserted in the picto
@@ -31,10 +31,8 @@ def makePictoText(text, width=500, height=500, background_color="white",
     # paint the text on the image (centered)
     draw.text(((size_picto[0]-width_text)/2, (size_picto[1]-height_text)/2),
               text, (0, 2, 2), font=font)
-    # making the filename
-    filename = "pictoText_"+text+".png"
-    # saving the image
-    img.save(filename)
+    
+    return img
 
 
 def joinPictos(list_of_pictos, texto, space=5, background_color='black'):
