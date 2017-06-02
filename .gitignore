@@ -2,6 +2,8 @@
 .apiKey
 .telegramApiKey
 .arasaacApiKey
+# Translations directories
+images/translations/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
