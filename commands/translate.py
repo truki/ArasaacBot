@@ -2,8 +2,10 @@ import ast
 import config
 import json
 import logging
+import os
 import sqlite3
 import telegram
+import aux.images
 
 from multiprocessing.pool import ThreadPool
 
@@ -57,13 +59,15 @@ def getPictosFromArasaacAPI(language, word):
     return pictos
 
 
-def getAndInsertWords(id_translation, language, word, position):
+def getAndInsertWord(id_translation, language, word, position):
     '''
     Functions that insert (YES now insert) a word of a translation into
     translations_details table.
     Call another function (getPictosFromArasaacAPI) to get pictos field
     (a list with all pictograms objects returned by querying Arasaac API
     with a word and a language)
+    Also save a Pictogram with the word on:
+    ../images/translation/<id_translation>/pictoText_<word>.png
     '''
 
     try:
@@ -75,6 +79,19 @@ def getAndInsertWords(id_translation, language, word, position):
         c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
+        try:
+            # Get de Pictogram with the word inside (center)
+            pictoText = aux.images.makePictoText(word)
+            path = os.getcwd()+"/images/translations/"+str(id_translation)+"/"
+            # make the directory for the translation
+            os.makedirs(path, exist_ok=True)
+            # make the file name (full path name)
+            filename = path+"pictoText_"+word+".png"
+            # saving the image
+            pictoText.save(filename)
+            logger.info("PictoText: {0} has been saved to {1}.".format(word, filename))
+        except Exception as e:
+            logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
     except sqlite3.Error as e:
         logger.error("Error inserting on translations_details: {}".format(e.args[0]))
     finally:
@@ -99,7 +116,7 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
         pool = ThreadPool(len(text_to_translate))
         for word in text_to_translate:
             position = text_to_translate.index(word)
-            pool.apply_async(getAndInsertWords, args=(id_translation, language, word, position))
+            pool.apply_async(getAndInsertWord, args=(id_translation, language, word, position))
             text_to_translate[text_to_translate.index(word)] = ""
 
 
@@ -189,7 +206,9 @@ def translate_stage1_language_callback(bot, update):
     keyboard = []
     keys = []
     for word in translation:
-        keys.append(telegram.InlineKeyboardButton(word, callback_data='trans.word.'+word+'.lang.ES.'+str(id)))
+        position = translation.index(word)
+        keys.append(telegram.InlineKeyboardButton(word, callback_data='trans.word.'+word+'.position.'+str(position)+'.lang.ES.'+str(id)))
+        translation[position]=""
 
     keyboard.append(keys)
 
@@ -203,4 +222,16 @@ def translate_stage1_language_callback(bot, update):
 
 
 def translate_stage2_word_callback(bot, update):
-    pass
+    query = update.callback_query
+    translation = []
+    # obtain callback_data that was sended between '.' character delimiter
+    data = query.data.split('.')
+    # word specified
+    word = data[2]
+    # position of the word
+    position = int(data[4])
+    # language
+    language = data[6]
+    # id of translation
+    id_translation = int(data[7])
+    logger.info("Wrord pressed: {0} - position: {1} - id_translation: {2}.".format(word, position, id_translation))
