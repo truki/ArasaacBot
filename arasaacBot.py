@@ -39,10 +39,6 @@ def main():
     global TELEGRAM_API_KEY
     TELEGRAM_API_KEY = config.loadTelegramApiKey(".telegramApiKey")
 
-    # Global variable to store user operations
-    global users
-    users = {}
-
     http = config.httpPool()
     logger.info(type(http))
 
