@@ -1,6 +1,23 @@
 from PIL import Image, ImageFont, ImageDraw
 
+import config
+import logging
+
 import os
+import requests
+
+
+def getAndSavePicFromUrl(url, path_to_save, image_name):
+    '''
+    Function that get an image from a URL and save it into a specific 
+    path passed like parameter
+    '''
+    print("Downloading an image from this URL: {}".format(url))
+    r = requests.get(url, stream=True)
+    i = Image.open(r.content)
+    i.save(image_name)
+    print("Saving image to this path: {}".format(path_to_save))
+
 
 
 def makePictoText(text, width=500, height=500, background_color="white",
