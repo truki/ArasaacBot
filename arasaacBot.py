@@ -87,8 +87,8 @@ def main():
 
     # init Bot
     updater.start_polling()
-    updater.idle()
     logger.info("Bot started")
+    updater.idle()
 
 
 if __name__ == "__main__":
