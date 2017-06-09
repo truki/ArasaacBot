@@ -1,23 +1,23 @@
 from PIL import Image, ImageFont, ImageDraw
-
 import config
 import logging
-
 import os
-import requests
+import urllib.request
+
+logger = logging.getLogger(__name__)
 
 
 def getAndSavePicFromUrl(url, path_to_save, image_name):
     '''
-    Function that get an image from a URL and save it into a specific 
+    Function that get an image from a URL and save it into a specific
     path passed like parameter
     '''
-    print("Downloading an image from this URL: {}".format(url))
-    r = requests.get(url, stream=True)
-    i = Image.open(r.content)
-    i.save(image_name)
-    print("Saving image to this path: {}".format(path_to_save))
-
+    print("Downloading and saving image: {}".format(image_name))
+    try:
+        urllib.request.urlretrieve(url, path_to_save+'/'+image_name)
+        print("Saving image to this path: {}".format(path_to_save))
+    except Exception as e:
+        logger.error("while downloading and saving the pic image: {0} ".format(image_name, e.args[0]))
 
 
 def makePictoText(text, width=500, height=500, background_color="white",
@@ -48,7 +48,6 @@ def makePictoText(text, width=500, height=500, background_color="white",
     # paint the text on the image (centered)
     draw.text(((size_picto[0]-width_text)/2, (size_picto[1]-height_text)/2),
               text, (0, 2, 2), font=font)
-    
     return img
 
 
