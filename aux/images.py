@@ -14,8 +14,8 @@ def getAndSavePicFromUrl(url, path_to_save, image_name):
     '''
     print("Downloading and saving image: {}".format(image_name))
     try:
-        urllib.request.urlretrieve(url, path_to_save+'/'+image_name)
-        print("Saving image to this path: {}".format(path_to_save))
+        urllib.request.urlretrieve(url, path_to_save+image_name)
+        logger.info("Saving image to this path: {}".format(path_to_save))
     except Exception as e:
         logger.error("while downloading and saving the pic image: {0} ".format(image_name, e.args[0]))
 
@@ -51,13 +51,13 @@ def makePictoText(text, width=500, height=500, background_color="white",
     return img
 
 
-def joinPictos(list_of_pictos, texto, space=5, background_color='black'):
+def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color='black'):
     '''
     Function that receive a list of pictos (filenames) in an order
-    and return a image where all pitograms in the list given are together
+    and save a image where all pitograms in the list given are together
     with a space between them.
     The image is saved on:
-    /images/tranlations/<text_to_translate>/<text_to_translate>_translated.png
+    /images/tranlations/<id_translation>/<text_to_translate>_translated.png
     This function is used to return the result of a translation
     '''
 
@@ -75,7 +75,7 @@ def joinPictos(list_of_pictos, texto, space=5, background_color='black'):
     for im in list_images:
         new_image.paste(im, (x_offset+space, space))
         x_offset += im.size[0]+space
-    path = os.getcwd()+'/images/translations/'+texto+'/'
+    path = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
     os.makedirs(path)
     filename = path + texto + '_translated.png'
     new_image.save(filename)
