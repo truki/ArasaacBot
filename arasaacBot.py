@@ -81,8 +81,8 @@ def main():
 
 
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage1_language_callback, pattern="trans.lang"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage2_word_callback, pattern="trans.word"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage1_language_callback, pattern="tr.lang"))
+    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage2_word_callback, pattern="tr.word"))
 
 
     # init Bot
