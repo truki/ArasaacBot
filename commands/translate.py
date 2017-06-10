@@ -95,13 +95,10 @@ def getAndInsertWord(id_translation, language, word, position):
         # it is not necessary an order in this list
         listPictosPath = []
         for picto in pictos:
-            print("He pasado {}".format(picto))
             urlPicto = picto['imagePNGURL']
             filenamePicto = urlPicto.split('/')[-1]
-            print("He pasado2 filenamePicto {}".format(filenamePicto))
             aux.images.getAndSavePicFromUrl(urlPicto, path, filenamePicto)
             listPictosPath.append(path+filenamePicto)
-            print("He pasado3 listPictosPath {}".format(listPictosPath))
 
 
         # append pictoText path to listPictosPath
@@ -154,15 +151,13 @@ def translate(bot, update, args):
     id_translation = insertTranslation(str(args))
 
     # Fist stage the user must to choose the language
-    keyboard = [[telegram.InlineKeyboardButton("Español", callback_data='trans.lang.ES.'+str(id_translation)),
-                 telegram.InlineKeyboardButton("English", callback_data='trans.lang.EN.'+str(id_translation)),
-                 telegram.InlineKeyboardButton("French", callback_data='trans.lang.FR.'+str(id_translation))],
-                [telegram.InlineKeyboardButton("Italian", callback_data='trans.lang.IT.'+str(id_translation)),
-                 telegram.InlineKeyboardButton("Catalan", callback_data='trans.lang.CA.'+str(id_translation)),
-                 telegram.InlineKeyboardButton("German", callback_data='trans.lang.GE.'+str(id_translation))]
+    keyboard = [[telegram.InlineKeyboardButton("Español", callback_data='tr.lang.ES.'+str(id_translation)),
+                 telegram.InlineKeyboardButton("English", callback_data='tr.lang.EN.'+str(id_translation)),
+                 telegram.InlineKeyboardButton("French", callback_data='tr.lang.FR.'+str(id_translation))],
+                [telegram.InlineKeyboardButton("Italian", callback_data='tr.lang.IT.'+str(id_translation)),
+                 telegram.InlineKeyboardButton("Catalan", callback_data='tr.lang.CA.'+str(id_translation)),
+                 telegram.InlineKeyboardButton("German", callback_data='tr.lang.GE.'+str(id_translation))]
                  ]
-    print("id_translation: {}".format(str(id_translation)))
-
     # Send message with text to translate and with a keyboard with
     # all languages options
     bot.send_message(chat_id=update.message.chat_id,
@@ -225,14 +220,18 @@ def translate_stage1_language_callback(bot, update):
     # making the keyboard with all words that has pictograms
     keyboard = []
     keys = []
-    list_pictos={}
+    length_translation = len(translation)
+    order = ['0' for x in range(length_translation)]
+    print("Order list: {}".format(order))
+    order_str = ".".join(order)
+    print("Order string: {}".format(order_str))
     for word in translation:
         position = translation.index(word)
         # preparing the inline keyboard to show for the phrase to translate
-        keys.append(telegram.InlineKeyboardButton(word, callback_data='trans.word.'+word+'.position.'+str(position)+'.lang.ES.'+str(id)))
+        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
         translation[position]=""
+        # Create order list
 
-    logger.info("Completed dictionary with words of translations and its pictograms: {}".format(list_pictos))
     keyboard.append(keys)
 
     # Send message with (image in the future) and with the buttons
@@ -249,12 +248,59 @@ def translate_stage2_word_callback(bot, update):
     translation = []
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
+    print("DATA: {}".format(data))
     # word specified
     word = data[2]
     # position of the word
     position = int(data[4])
+    print("Position: {}".format(str(position)))
+    # length of translation
+    length_translation = int(data[6])
+    print("length: {}".format(str(length_translation)))
+    # list with order in listPictosPath
+    order = data[8:7+length_translation+1]
+    print("Order: {}".format(order))
     # language
-    language = data[6]
+    language = data[7+length_translation+2]
+    print("Language: {}".format(language))
     # id of translation
-    id_translation = int(data[7])
-    logger.info("Wrord pressed: {0} - position: {1} - id_translation: {2}.".format(word, position, id_translation))
+    id_translation = int(data[7+length_translation+3])
+    print("id_translation: {}".format(str(id_translation)))
+    try:
+        conn = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn.cursor()
+        c.execute('SELECT * FROM translations WHERE id=?', (id_translation,))
+        translation = c.fetchall()
+        if len(translation)>0:
+            translation = translation[0][1] # texToTranslate field
+            translation = ast.literal_eval(translation)
+        else:
+            logger.info("UPPS: The translation id: {} don't exists!!!".format(str(id)))
+    except sqlite3.Error as e:
+        logger.error("An error occur while querying for an specified translation id")
+    finally:
+        conn.close()
+
+    # making the keyboard with all words that has pictograms
+    keyboard = []
+    keys = []
+    print("Translation text: {}".format(translation))
+    length_translation = len(translation)
+    print("Order list: {}".format(order))
+    order[position]=str(int(order[position])+1)
+    order_str = ".".join(order)
+    print("Order string: {}".format(order_str))
+    for word in translation:
+        position_word = translation.index(word)
+        # preparing the inline keyboard to show for the phrase to translate
+        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
+        translation[position]=""
+
+    keyboard.append(keys)
+    try:
+        bot.send_message(chat_id=query.message.chat_id,
+                 text="Choose the word button to change pictograms",
+                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
+                 parse_mode=telegram.ParseMode.HTML)
+    except Exception as e:
+        print(e)
