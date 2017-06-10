@@ -71,27 +71,47 @@ def getAndInsertWord(id_translation, language, word, position):
     '''
 
     try:
+        # make the directory for the translation
+        path = os.getcwd()+"/images/translations/"+str(id_translation)+"/"
+        os.makedirs(path, exist_ok=True)
+
+        try:
+            # Get de Pictogram with the word inside (center)
+            pictoText = aux.images.makePictoText(word)
+            # make the file name (full path name)
+            filenamePictoText = path+"pictoText_"+word+".png"
+            # saving the image
+            pictoText.save(filenamePictoText)
+            logger.info("PictoText: {0} has been saved to {1}.".format(word, filenamePictoText))
+        except Exception as e:
+            logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
+
         # Get pictos from Arasaac
         pictos = getPictosFromArasaacAPI(language, word)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
+
+        # inserts all path for pictos in this word for a id_translation
+        # it is not necessary an order in this list
+        listPictosPath = []
+        for picto in pictos:
+            print("He pasado {}".format(picto))
+            urlPicto = picto['imagePNGURL']
+            filenamePicto = urlPicto.split('/')[-1]
+            print("He pasado2 filenamePicto {}".format(filenamePicto))
+            aux.images.getAndSavePicFromUrl(urlPicto, path, filenamePicto)
+            listPictosPath.append(path+filenamePicto)
+            print("He pasado3 listPictosPath {}".format(listPictosPath))
+
+
+        # append pictoText path to listPictosPath
+        listPictosPath.append(filenamePictoText)
+
         # insert into translations_details
-        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos) VALUES (?, ?, ?, ?)", (id_translation, word, position, str(pictos)))
+        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos, listPictosPath) VALUES (?, ?, ?, ?, ?)", (id_translation, word, position, str(pictos), str(listPictosPath)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
-        try:
-            # Get de Pictogram with the word inside (center)
-            pictoText = aux.images.makePictoText(word)
-            path = os.getcwd()+"/images/translations/"+str(id_translation)+"/"
-            # make the directory for the translation
-            os.makedirs(path, exist_ok=True)
-            # make the file name (full path name)
-            filename = path+"pictoText_"+word+".png"
-            # saving the image
-            pictoText.save(filename)
-            logger.info("PictoText: {0} has been saved to {1}.".format(word, filename))
-        except Exception as e:
-            logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
+
     except sqlite3.Error as e:
         logger.error("Error inserting on translations_details: {}".format(e.args[0]))
     finally:
@@ -205,11 +225,14 @@ def translate_stage1_language_callback(bot, update):
     # making the keyboard with all words that has pictograms
     keyboard = []
     keys = []
+    list_pictos={}
     for word in translation:
         position = translation.index(word)
+        # preparing the inline keyboard to show for the phrase to translate
         keys.append(telegram.InlineKeyboardButton(word, callback_data='trans.word.'+word+'.position.'+str(position)+'.lang.ES.'+str(id)))
         translation[position]=""
 
+    logger.info("Completed dictionary with words of translations and its pictograms: {}".format(list_pictos))
     keyboard.append(keys)
 
     # Send message with (image in the future) and with the buttons
