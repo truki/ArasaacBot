@@ -297,11 +297,12 @@ def translate_stage2_word_callback(bot, update):
         translation[position]=""
 
     keyboard.append(keys)
+
     print("LONGITUD del keyboard: {}".format(len(keyboard[0])))
     try:
         bot.send_message(chat_id=query.message.chat_id,
                  text="Choose the word button to change pictograms",
-                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
+                 reply_markup = telegram.InlineKeyboardMarkup(keyboard,one_time_keyboard=True),
                  parse_mode=telegram.ParseMode.HTML)
     except Exception as e:
         print(e)
