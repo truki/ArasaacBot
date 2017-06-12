@@ -294,15 +294,13 @@ def translate_stage2_word_callback(bot, update):
         position_word = translation.index(word)
         # preparing the inline keyboard to show for the phrase to translate
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
-        translation[position]=""
-
+        translation[position_word]=""
     keyboard.append(keys)
-
-    print("LONGITUD del keyboard: {}".format(len(keyboard[0])))
     try:
-        bot.send_message(chat_id=query.message.chat_id,
+        bot.editMessageText(message_id=query.message.message_id,
+                 chat_id=query.message.chat.id,
                  text="Choose the word button to change pictograms",
-                 reply_markup = telegram.InlineKeyboardMarkup(keyboard,one_time_keyboard=True),
+                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
                  parse_mode=telegram.ParseMode.HTML)
     except Exception as e:
         print(e)
