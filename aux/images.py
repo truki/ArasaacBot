@@ -57,7 +57,7 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
     and save a image where all pitograms in the list given are together
     with a space between them.
     The image is saved on:
-    /images/tranlations/<id_translation>/<text_to_translate>_translated.png
+    /images/tranlations/<id_translation>/<id>_translated.png
     This function is used to return the result of a translation
     '''
 
@@ -77,5 +77,5 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
         x_offset += im.size[0]+space
     path = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
     os.makedirs(path)
-    filename = path + texto + '_translated.png'
+    filename = path + str(id_translation) + '_translation.png'
     new_image.save(filename)

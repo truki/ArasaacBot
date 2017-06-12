@@ -9,7 +9,6 @@ import aux.images
 
 from multiprocessing.pool import ThreadPool
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -215,6 +214,7 @@ def translate_stage1_language_callback(bot, update):
     # After update with the language, inserts all the words into
     # translations_details table
     translation_copy = list(translation)
+    translation_copy2 = list(translation)
     insertWordsToTranslationsDetails(translation_copy, language, id)
 
     # making the keyboard with all words that has pictograms
@@ -232,15 +232,34 @@ def translate_stage1_language_callback(bot, update):
         translation[position]=""
         # Create order list
 
+    # join pictos
+    list_pictos_to_join = []
+    for word in translation_copy2:
+        position = translation_copy2.index(word)
+        conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn_update.cursor()
+        c.execute('''SELECT listPictosPath FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id, word, position))
+        # obtener el valor con orden adecuado de la palabra-posicion
+        result = ast.literal_eval(c.fetchall())
+        # append to list_pictos_to_join
+        list_pictos_to_join.append(result[order[position]])
+        conn_select.close()
+        translation_copy2[position]=""
+    aux.images.joinPictos()
+    
+    path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
     keyboard.append(keys)
-
     # Send message with (image in the future) and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
-    bot.send_message(chat_id=query.message.chat_id,
-                 text="Choose the word button to change pictograms",
-                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
-                 parse_mode=telegram.ParseMode.HTML)
+
+    try:
+        bot.sendPhoto(chat_id=query.message.chat_id,
+                    photo=open(path_photo, 'rb'),
+                    caption="Choose the word button to change pictogramsx",
+                    reply_markup = telegram.InlineKeyboardMarkup(keyboard))
+    except Exception as e:
+        print("Error: {}".format(e.args[0]))
 
 
 def translate_stage2_word_callback(bot, update):
@@ -296,11 +315,11 @@ def translate_stage2_word_callback(bot, update):
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
         translation[position_word]=""
     keyboard.append(keys)
+    path_photo=os.getcwd()+"/images/translations/"+str(id_translation)+"/"+str(id_translation)+"_translation.png"
     try:
-        bot.editMessageText(message_id=query.message.message_id,
-                 chat_id=query.message.chat.id,
-                 text="Choose the word button to change pictograms",
-                 reply_markup = telegram.InlineKeyboardMarkup(keyboard),
-                 parse_mode=telegram.ParseMode.HTML)
+        bot.sendPhoto(chat_id=query.message.chat_id,
+                    photo=open(path_photo, 'rb'),
+                    caption="Choose the word button to change pictogramsx",
+                    reply_markup = telegram.InlineKeyboardMarkup(keyboard))
     except Exception as e:
         print(e)
