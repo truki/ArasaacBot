@@ -4,6 +4,7 @@ import config
 import json
 import logging
 import telegram
+import unicodedata
 import urllib3
 
 from multiprocessing.pool import ThreadPool
@@ -62,6 +63,7 @@ def getPictos(lang, word, force=False):
     '''
     Function that return a list of pictos in a specific languages
     '''
+    word_ascii_utf8 = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
     pictos = []
     if not(force):
         pictos = existsInCacheAndValid(lang, word)
@@ -70,7 +72,7 @@ def getPictos(lang, word, force=False):
     if len(pictos)<1 or force:
         query = 'http://arasaac.org/api/index.php?callback=json'
         query += '&language='+lang
-        query += '&word='+word
+        query += '&word='+word_ascii_utf8
         query += '&catalog=colorpictos&nresults=500&thumbnailsize=100&TXTlocate=4'
         query += '&KEY=' + config.loadArasaacApiKey(".arasaacApiKey")
         http = config.httpPool()
@@ -100,7 +102,6 @@ def getListPictos(languages, word, force=False):
     # if force is not true, lookfor in cache
     for lang in languages:
         pictos_temp.append(pool.apply_async(getPictos, args=(lang, word, force)))
-
     pool.close()
     pool.join()
     print("Pictos: {}".format(pictos_temp))
