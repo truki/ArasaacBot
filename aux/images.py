@@ -76,6 +76,10 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
         new_image.paste(im, (x_offset+space, space))
         x_offset += im.size[0]+space
     path = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
-    os.makedirs(path)
+    os.makedirs(path, exist_ok=True)
     filename = path + str(id_translation) + '_translation.png'
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
     new_image.save(filename)
