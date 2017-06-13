@@ -61,7 +61,7 @@ def getPictosFromArasaacAPI(language, word):
     return pictos
 
 
-def getAndInsertWord(id_translation, language, word, position):
+def getAndInsertWord(id_translation, language, word_ascci_utf, word, position):
     '''
     Functions that insert (YES now insert) a word of a translation into
     translations_details table.
@@ -89,7 +89,7 @@ def getAndInsertWord(id_translation, language, word, position):
             logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
 
         # Get pictos from Arasaac
-        pictos = getPictosFromArasaacAPI(language, word)
+        pictos = getPictosFromArasaacAPI(language, word_ascci_utf)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
 
@@ -107,7 +107,7 @@ def getAndInsertWord(id_translation, language, word, position):
         listPictosPath.append(filenamePictoText)
 
         # insert into translations_details
-        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos, listPictosPath) VALUES (?, ?, ?, ?, ?)", (id_translation, word, position, str(pictos), str(listPictosPath)))
+        c.execute("INSERT INTO translations_details (idtranslation, word, position, pictos, listPictosPath) VALUES (?, ?, ?, ?, ?)", (id_translation, word_ascci_utf, position, str(pictos), str(listPictosPath)))
         logger.info("Inserted word: {} to translate of tranlation id: {} ".format(word, str(id_translation)))
         conn.commit()
 
@@ -136,7 +136,7 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
         for word in text_to_translate:
             position = text_to_translate.index(word)
             word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
-            pool.apply_async(getAndInsertWord, args=(id_translation, language, word_ascii_utf, position))
+            pool.apply_async(getAndInsertWord, args=(id_translation, language, word_ascii_utf, word, position))
             text_to_translate[text_to_translate.index(word)] = ""
         pool.close()
         pool.join()
