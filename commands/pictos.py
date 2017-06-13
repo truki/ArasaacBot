@@ -19,7 +19,6 @@ def getPictosFromArasaac(query_url):
     data = json.loads(req.data.decode('utf-8'))
     # only return 'symbols' field (array of JSON objects)
     pictograms = data["symbols"]
-    print("PICTOGRAMS {}".format(pictograms))
     return pictograms
 
 
@@ -95,8 +94,9 @@ def getPictosColor(bot, update, args):
         bot.send_message(chat_id=update.message.chat_id,
                      text='<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>',
                      parse_mode=telegram.ParseMode.HTML)
-        bot.send_audio(chat_id=update.message.chat_id,
-                       audio=picto['soundMP3URL'])
+        if 'soundMP3URL' in picto.keys():
+            bot.send_audio(chat_id=update.message.chat_id,
+                           audio=picto['soundMP3URL'])
 
 def getPictosBW(bot, update, args):
     '''
@@ -115,15 +115,21 @@ def getPictosBW(bot, update, args):
     datos= json.loads(req.data.decode('utf-8'))
     pictos = datos["symbols"]
     logger.info("/getPicsBW PICTOS: {}".format(pictos))
-    for picto in pictos:
-        logger.info("/getPicsBW MP3: {}".format(picto['soundMP3URL']))
-        html = '<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>\n'
-        bot.send_message(chat_id=update.message.chat_id,
-                     text=html,
-                     parse_mode=telegram.ParseMode.HTML)
-        bot.send_audio(chat_id=update.message.chat_id,
-                       audio=picto['soundMP3URL'])
-
+    if len(pictos) > 0:
+        for picto in pictos:
+            html = '<a href="'+picto['imagePNGURL']+'">'+picto['name']+'</a>\n'
+            bot.send_message(chat_id=update.message.chat_id,
+                         text=html,
+                         parse_mode=telegram.ParseMode.HTML)
+            if 'soundMP3URL' in picto.keys():
+                bot.send_audio(chat_id=update.message.chat_id,
+                               audio=picto['soundMP3URL'])
+        else:
+            bot.sendPhoto(chat_id=update.message.chat_id,
+                          photo=open('images/ArasaacBot_icon_100x100.png', 'rb'))
+            bot.send_message(chat_id=update.message.chat_id,
+                             text="*No pictograms were founded!!* \n launch another query",
+                             parse_mode=telegram.ParseMode.MARKDOWN)
 
 def getPics(bot, update, args):
     '''
@@ -231,7 +237,14 @@ def getPics_stage3_search(bot, update):
 
     pictograms = getPictosFromQuery(word, color, language, search)
 
-    for picto in pictograms:
+    if len(pictograms) > 0:
+        for picto in pictograms:
+            bot.sendPhoto(chat_id=query.message.chat_id,
+                          photo=picto['imagePNGURL'],
+                          caption=picto['name'])
+    else:
         bot.sendPhoto(chat_id=query.message.chat_id,
-                      photo=picto['imagePNGURL'],
-                      caption=picto['name'])
+                      photo=open('images/ArasaacBot_icon_100x100.png', 'rb'))
+        bot.send_message(chat_id=query.message.chat_id,
+                         text="*No pictograms were founded!!* \n launch another query",
+                         parse_mode=telegram.ParseMode.MARKDOWN)
