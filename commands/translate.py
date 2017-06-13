@@ -5,6 +5,7 @@ import logging
 import os
 import sqlite3
 import telegram
+import time
 import aux.images
 
 from multiprocessing.pool import ThreadPool
@@ -134,6 +135,8 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
             position = text_to_translate.index(word)
             pool.apply_async(getAndInsertWord, args=(id_translation, language, word, position))
             text_to_translate[text_to_translate.index(word)] = ""
+        pool.close()
+        pool.join()
 
 
 def translate(bot, update, args):
@@ -222,34 +225,41 @@ def translate_stage1_language_callback(bot, update):
     keys = []
     length_translation = len(translation)
     order = ['0' for x in range(length_translation)]
-    print("Order list: {}".format(order))
     order_str = ".".join(order)
-    print("Order string: {}".format(order_str))
+
+
+    # join pictos
+    list_pictos_to_join = []
+
+    for word in translation_copy2:
+        position = translation_copy2.index(word)
+        conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn_select.cursor()
+        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id, word, position))
+        # obtener el valor con orden adecuado de la palabra-posicion
+        result_temp = c.fetchall()
+        if len(result_temp) > 0:
+            result = ast.literal_eval(result_temp[0][6])
+        else:
+            result = []
+        # append to list_pictos_to_join
+        list_pictos_to_join.append(result[int(order[position])])
+        conn_select.close()
+        translation_copy2[position] = ""
+
+    print("List pictos to join: {}".format(list_pictos_to_join))
+    aux.images.joinPictos(list_pictos_to_join, id, "")
+
+    path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
+
     for word in translation:
         position = translation.index(word)
         # preparing the inline keyboard to show for the phrase to translate
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
-        translation[position]=""
+        translation[position] = ""
         # Create order list
-
-    # join pictos
-    list_pictos_to_join = []
-    for word in translation_copy2:
-        position = translation_copy2.index(word)
-        conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
-        c = conn_update.cursor()
-        c.execute('''SELECT listPictosPath FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id, word, position))
-        # obtener el valor con orden adecuado de la palabra-posicion
-        result = ast.literal_eval(c.fetchall())
-        # append to list_pictos_to_join
-        list_pictos_to_join.append(result[order[position]])
-        conn_select.close()
-        translation_copy2[position]=""
-    aux.images.joinPictos()
-    
-    path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
     keyboard.append(keys)
-    # Send message with (image in the future) and with the buttons
+    # Send message with image of translation and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
 
@@ -267,21 +277,16 @@ def translate_stage2_word_callback(bot, update):
     translation = []
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
-    print("DATA: {}".format(data))
     # word specified
     word = data[2]
     # position of the word
     position = int(data[4])
-    print("Position: {}".format(str(position)))
     # length of translation
     length_translation = int(data[6])
-    print("length: {}".format(str(length_translation)))
     # list with order in listPictosPath
     order = data[8:7+length_translation+1]
-    print("Order: {}".format(order))
     # language
     language = data[7+length_translation+2]
-    print("Language: {}".format(language))
     # id of translation
     id_translation = int(data[7+length_translation+3])
     print("id_translation: {}".format(str(id_translation)))
@@ -300,15 +305,39 @@ def translate_stage2_word_callback(bot, update):
     finally:
         conn.close()
 
+    translation_copy = list(translation)
+
     # making the keyboard with all words that has pictograms
     keyboard = []
     keys = []
-    print("Translation text: {}".format(translation))
     length_translation = len(translation)
-    print("Order list: {}".format(order))
-    order[position]=str(int(order[position])+1)
+    order[position] = str(int(order[position])+1 % length_translation)
     order_str = ".".join(order)
-    print("Order string: {}".format(order_str))
+
+
+
+    # join pictos
+    list_pictos_to_join = []
+    for word in translation_copy:
+        position = translation_copy.index(word)
+        conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn_select.cursor()
+        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id_translation, word, position))
+        # obtener el valor con orden adecuado de la palabra-posicion
+        result_temp = c.fetchall()
+        if len(result_temp) > 0:
+            result = ast.literal_eval(result_temp[0][6])
+        else:
+            result = []
+        # append to list_pictos_to_join
+        length_result = len(result)
+        list_pictos_to_join.append(result[int(order[position]) % length_result])
+        conn_select.close()
+        translation_copy[position] = ""
+
+    aux.images.joinPictos(list_pictos_to_join, id_translation, "")
+
+
     for word in translation:
         position_word = translation.index(word)
         # preparing the inline keyboard to show for the phrase to translate
@@ -319,7 +348,7 @@ def translate_stage2_word_callback(bot, update):
     try:
         bot.sendPhoto(chat_id=query.message.chat_id,
                     photo=open(path_photo, 'rb'),
-                    caption="Choose the word button to change pictogramsx",
+                    caption="Choose the word button to change pictograms",
                     reply_markup = telegram.InlineKeyboardMarkup(keyboard))
     except Exception as e:
         print(e)
