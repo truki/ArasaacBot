@@ -25,12 +25,16 @@ Command that run a "wizard" where the user can contruct the query to search the 
 
 ### translate
 
-  ```/translate <text to translate>```  WIP !!!!
+  ```/translate <text to translate>```
 
+  Command that translate to pictograms (if its possible) a phrase introduced like arguments.
+  Please don't insert putuation, question or exclamation symbols.
 
 ## Inline Mode
 
 ```@arasaacbot <word>```
+
+Inline command that previsualize a list of pictograms depending the argument passed.
 
 
 ## Credits
