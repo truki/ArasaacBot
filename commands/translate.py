@@ -6,6 +6,8 @@ import os
 import sqlite3
 import telegram
 import time
+import unicodedata
+
 import aux.images
 
 from multiprocessing.pool import ThreadPool
@@ -133,7 +135,8 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
         pool = ThreadPool(len(text_to_translate))
         for word in text_to_translate:
             position = text_to_translate.index(word)
-            pool.apply_async(getAndInsertWord, args=(id_translation, language, word, position))
+            word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
+            pool.apply_async(getAndInsertWord, args=(id_translation, language, word_ascii_utf, position))
             text_to_translate[text_to_translate.index(word)] = ""
         pool.close()
         pool.join()
@@ -233,9 +236,10 @@ def translate_stage1_language_callback(bot, update):
 
     for word in translation_copy2:
         position = translation_copy2.index(word)
+        word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
         conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn_select.cursor()
-        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id, word, position))
+        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id, word_ascii_utf, position))
         # obtener el valor con orden adecuado de la palabra-posicion
         result_temp = c.fetchall()
         if len(result_temp) > 0:
@@ -320,9 +324,10 @@ def translate_stage2_word_callback(bot, update):
     list_pictos_to_join = []
     for word in translation_copy:
         position = translation_copy.index(word)
+        word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
         conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn_select.cursor()
-        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id_translation, word, position))
+        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id_translation, word_ascii_utf, position))
         # obtener el valor con orden adecuado de la palabra-posicion
         result_temp = c.fetchall()
         if len(result_temp) > 0:
