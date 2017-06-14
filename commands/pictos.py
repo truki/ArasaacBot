@@ -184,16 +184,13 @@ def getPics_stage2_language(bot, update):
     of /pics command
     '''
     query = update.callback_query
-    print(query)
     # obtain callback_data that was sended between '.' character delimiter
     data = query.data.split('.')
     # Color specified
     language = data[2].upper()
     color = data[3]
     word = data[4]
-    print("Word: {}".format(word))
-    print("Color: {}".format(color))
-    print("Language: {}".format(language))
+
 
     # Third stage after choose language, now choose kind of search
     # (1-Begin in por 2-Contains 3-End on por 4-Exactly)
