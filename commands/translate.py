@@ -293,7 +293,6 @@ def translate_stage2_word_callback(bot, update):
     language = data[7+length_translation+2]
     # id of translation
     id_translation = int(data[7+length_translation+3])
-    print("id_translation: {}".format(str(id_translation)))
     try:
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
@@ -315,10 +314,8 @@ def translate_stage2_word_callback(bot, update):
     keyboard = []
     keys = []
     length_translation = len(translation)
-    order[position] = str(int(order[position])+1 % length_translation)
+    order[position] = str(int(order[position])+1)
     order_str = ".".join(order)
-
-
 
     # join pictos
     list_pictos_to_join = []
@@ -336,10 +333,11 @@ def translate_stage2_word_callback(bot, update):
             result = []
         # append to list_pictos_to_join
         length_result = len(result)
+        print("Length result: {}".format(length_result))
         list_pictos_to_join.append(result[int(order[position]) % length_result])
         conn_select.close()
         translation_copy[position] = ""
-
+    print("List pictos to join: {}".format(list_pictos_to_join))
     aux.images.joinPictos(list_pictos_to_join, id_translation, "")
 
 
