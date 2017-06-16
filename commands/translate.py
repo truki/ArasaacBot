@@ -251,7 +251,6 @@ def translate_stage1_language_callback(bot, update):
         conn_select.close()
         translation_copy2[position] = ""
 
-    print("List pictos to join: {}".format(list_pictos_to_join))
     aux.images.joinPictos(list_pictos_to_join, id, "")
 
     path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
@@ -333,11 +332,9 @@ def translate_stage2_word_callback(bot, update):
             result = []
         # append to list_pictos_to_join
         length_result = len(result)
-        print("Length result: {}".format(length_result))
         list_pictos_to_join.append(result[int(order[position]) % length_result])
         conn_select.close()
         translation_copy[position] = ""
-    print("List pictos to join: {}".format(list_pictos_to_join))
     aux.images.joinPictos(list_pictos_to_join, id_translation, "")
 
 

@@ -61,14 +61,22 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
     This function is used to return the result of a translation
     '''
 
+    # open all images in a list of Image objects
     images = map(Image.open, list_of_pictos)
+    # create to list with the widths and heights
     widths, heights = zip(*(i.size for i in images))
-    print("widths: {0} and heights: {1}".format(widths, heights))
+    # calc the total width and max height
     total_width = sum(widths)
     max_heigth = max(heights)
 
+    # Create a new image with RGBA color scheme with black background
+    # and with a width of total_width plus  the spaces between them
+    # and with a height of max_height plus 2 spaces 
     new_image = Image.new('RGBA', (total_width+(space*(len(list_of_pictos)+1)),
                           max_heigth+2*space), background_color)
+    
+    # Now we take the list of Image objects and we pasted it
+    # over new_image secuencially
     x_offset = 0
     images = map(Image.open, list_of_pictos)
     list_images = list(images)
@@ -76,10 +84,15 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
         new_image.paste(im, (x_offset+space, space))
         x_offset += im.size[0]+space
     path = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
+    
+    # create the correct directory
     os.makedirs(path, exist_ok=True)
+    # create the filename path
     filename = path + str(id_translation) + '_translation.png'
+    # remove it, if exist
     try:
         os.remove(filename)
     except OSError:
         pass
+    # finally we save it:
     new_image.save(filename)
