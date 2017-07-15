@@ -124,10 +124,10 @@ def getPictosBW(bot, update, args):
             if 'soundMP3URL' in picto.keys():
                 bot.send_audio(chat_id=update.message.chat_id,
                                audio=picto['soundMP3URL'])
-        else:
-            bot.sendPhoto(chat_id=update.message.chat_id,
+    else:
+        bot.sendPhoto(chat_id=update.message.chat_id,
                           photo=open('images/ArasaacBot_icon_100x100.png', 'rb'))
-            bot.send_message(chat_id=update.message.chat_id,
+        bot.send_message(chat_id=update.message.chat_id,
                              text="*No pictograms were founded!!* \n launch another query",
                              parse_mode=telegram.ParseMode.MARKDOWN)
 
