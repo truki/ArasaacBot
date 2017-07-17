@@ -4,6 +4,8 @@
 .arasaacApiKey
 # Translations directories
 images/translations/
+# Local configuration files
+proxy.ini
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

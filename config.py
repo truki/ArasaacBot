@@ -10,7 +10,6 @@ parser = ConfigParser()
 def loadDatabaseConfiguration(name):
     try:
         conn = sqlite3.connect(name)
-        logger.info("Connected to database: {}".format(name))
         return conn
     except:
         logger.error("Error connecting to database: {}".format(name))
