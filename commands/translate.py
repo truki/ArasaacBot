@@ -262,7 +262,7 @@ def translate_stage1_language_callback(bot, update):
         translation[position] = ""
         # Create order list
     keyboard.append(keys)
-    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id))])
+    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id)+'.ord.'+order_str+'.len.'+str(length_translation))])
     # Send message with image of translation and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
@@ -345,8 +345,7 @@ def translate_stage2_word_callback(bot, update):
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
         translation[position_word] = ""
     keyboard.append(keys)
-    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id_translation))])
-    print("teclado: {}".format(keyboard.__str__))
+    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id_translation)+'.ord.'+order_str+'.len.'+str(length_translation))])
     path_photo=os.getcwd()+"/images/translations/"+str(id_translation)+"/"+str(id_translation)+"_translation.png"
     try:
         bot.sendPhoto(chat_id=query.message.chat_id,
@@ -355,3 +354,7 @@ def translate_stage2_word_callback(bot, update):
                     reply_markup = telegram.InlineKeyboardMarkup(keyboard))
     except Exception as e:
         print(e)
+
+
+def agenda_callback (bot, update):
+    pass
