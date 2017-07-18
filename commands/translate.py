@@ -392,6 +392,7 @@ def agenda_callback (bot, update):
     print("Text to translate: {}".format(translation))
     translation_copy = list(translation)
 
+    list_pictos_to_mark = []
     for word in translation_copy:
         position = translation_copy.index(word)
         word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
@@ -406,6 +407,8 @@ def agenda_callback (bot, update):
             result = []
         # append to list_pictos_to_join
         length_result = len(result)
-        list_pictos_to_join.append(result[int(order[position]) % length_result])
+        list_pictos_to_mark.append(result[int(order[position]) % length_result])
         conn_select.close()
         translation_copy[position] = ""
+
+    print("Result: {}".format(list_pictos_to_mark))
