@@ -7,6 +7,25 @@ import urllib.request
 logger = logging.getLogger(__name__)
 
 
+def markPictogram(path_to_picto):
+    '''
+    Function that receive a path to a picto and create a new pictogram
+    marked with two cross lines in the form of X
+    '''
+    # open pictogram to mark
+    img = Image.open(path_to_picto)
+    # get size
+    (width, height) = img.size
+    # create Draw instance over img
+    draw = ImageDraw.Draw(img)
+    # Drawing a mark crossing lines in the form of a 'X'
+    draw.line((30, 30, width-30, height-30), width=30, fill="black")
+    draw.line((30, height-30, width-30, 30), width=30, fill="black")
+    # return the image object
+    return img
+
+
+
 def getAndSavePicFromUrl(url, path_to_save, image_name):
     '''
     Function that get an image from a URL and save it into a specific
@@ -26,7 +45,7 @@ def makePictoText(text, width=500, height=500, background_color="white",
     Function that make a pictogram with a background color, and with
     a text inside
     size = (width, high)
-        '''
+    '''
     # tuple with size of pictogram
     size_picto = (width, height)
     # make a picto with white background color with Image constructor
@@ -71,10 +90,10 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
 
     # Create a new image with RGBA color scheme with black background
     # and with a width of total_width plus  the spaces between them
-    # and with a height of max_height plus 2 spaces 
+    # and with a height of max_height plus 2 spaces
     new_image = Image.new('RGBA', (total_width+(space*(len(list_of_pictos)+1)),
                           max_heigth+2*space), background_color)
-    
+
     # Now we take the list of Image objects and we pasted it
     # over new_image secuencially
     x_offset = 0
@@ -84,7 +103,7 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
         new_image.paste(im, (x_offset+space, space))
         x_offset += im.size[0]+space
     path = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
-    
+
     # create the correct directory
     os.makedirs(path, exist_ok=True)
     # create the filename path
