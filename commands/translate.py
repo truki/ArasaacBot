@@ -392,7 +392,8 @@ def agenda_callback (bot, update):
     print("Text to translate: {}".format(translation))
     translation_copy = list(translation)
 
-    list_pictos_to_mark = []
+    list_pictos = []
+    list_pictos_marked = []
     for word in translation_copy:
         position = translation_copy.index(word)
         word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
@@ -407,8 +408,34 @@ def agenda_callback (bot, update):
             result = []
         # append to list_pictos_to_join
         length_result = len(result)
-        list_pictos_to_mark.append(result[int(order[position]) % length_result])
+        picto = result[int(order[position]) % length_result]
+        list_pictos.append(picto)
+        path_dir_picto_marked = os.getcwd()+'/images/translations/'+str(id_translation)+'/'
+        picto_marked_filename = picto.split('/')[-1].split('.')[0]+"_marked.png"
+        path_picto_marked = path_dir_picto_marked+picto_marked_filename
+        picto_marked = aux.images.markPictogram(picto)
+        try:
+            os.remove(path_picto_marked)
+        except OSError:
+            pass
+        # finally we save it:
+        picto_marked.save(path_picto_marked)
+
+        list_pictos_marked.append(path_picto_marked)
         conn_select.close()
         translation_copy[position] = ""
 
-    print("Result: {}".format(list_pictos_to_mark))
+    agenda = []
+    filename = aux.images.joinPictos(list_pictos, id_translation, "0")
+    agenda.append(filename)
+    for i in range(length_translation):
+        filename = aux.images.joinPictos(list_pictos_marked[:i+1]+list_pictos[i+1:], id_translation, texto=str(i+1))
+        agenda.append(filename)
+
+    print("Agenda: {}".format(agenda))
+    for fila in agenda:
+        try:
+            bot.sendPhoto(chat_id=query.message.chat_id,
+                        photo=open(fila, 'rb'))
+        except Exception as e:
+            print(e)
