@@ -70,7 +70,7 @@ def makePictoText(text, width=500, height=500, background_color="white",
     return img
 
 
-def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color='black'):
+def joinPictos(list_of_pictos, id_translation, texto="", space=5, background_color='black'):
     '''
     Function that receive a list of pictos (filenames) in an order
     and save a image where all pitograms in the list given are together
@@ -107,7 +107,10 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
     # create the correct directory
     os.makedirs(path, exist_ok=True)
     # create the filename path
-    filename = path + str(id_translation) + '_translation.png'
+    if texto == "":
+        filename = path + str(id_translation) + '_translation.png'
+    else:
+        filename = path + str(id_translation) + '_agenda_' + texto + '.png'
     # remove it, if exist
     try:
         os.remove(filename)
@@ -115,3 +118,5 @@ def joinPictos(list_of_pictos, id_translation, texto, space=5, background_color=
         pass
     # finally we save it:
     new_image.save(filename)
+
+    return filename
