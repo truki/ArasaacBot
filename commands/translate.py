@@ -262,7 +262,7 @@ def translate_stage1_language_callback(bot, update):
         translation[position] = ""
         # Create order list
     keyboard.append(keys)
-    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id)+'.ord.'+order_str+'.len.'+str(length_translation))])
+    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id)+'.len.'+str(length_translation)+'.ord.'+order_str)])
     # Send message with image of translation and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
@@ -345,7 +345,7 @@ def translate_stage2_word_callback(bot, update):
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
         translation[position_word] = ""
     keyboard.append(keys)
-    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id_translation)+'.ord.'+order_str+'.len.'+str(length_translation))])
+    keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id_translation)+'.len.'+str(length_translation)+'.ord.'+order_str)])
     path_photo=os.getcwd()+"/images/translations/"+str(id_translation)+"/"+str(id_translation)+"_translation.png"
     try:
         bot.sendPhoto(chat_id=query.message.chat_id,
@@ -357,4 +357,55 @@ def translate_stage2_word_callback(bot, update):
 
 
 def agenda_callback (bot, update):
-    pass
+    logger.info("Making an Agenda")
+    query = update.callback_query
+    # obtain callback_data that was sended between '.' character delimiter
+    data = query.data.split('.')
+    print("Data: {}".format(data))
+    # get the length of translation
+    length_translation = int(data[3])
+    print("Length: {}".format(length_translation))
+    # list with order in listPictosPath
+    order = data[5:4+length_translation+1]
+    print("Order: {}".format(order))
+    # id of translation
+    id_translation = int(data[1])
+    print("Id translation: {}".format(id_translation))
+
+    translation = []
+
+    try:
+        conn = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn.cursor()
+        c.execute('SELECT * FROM translations WHERE id=?', (id_translation,))
+        translation = c.fetchall()
+        if len(translation)>0:
+            translation = translation[0][1] # texToTranslate field
+            translation = ast.literal_eval(translation)
+        else:
+            logger.info("UPPS: The translation id: {} don't exists!!!".format(str(id)))
+    except sqlite3.Error as e:
+        logger.error("An error occur while querying for an specified translation id")
+    finally:
+        conn.close()
+
+    print("Text to translate: {}".format(translation))
+    translation_copy = list(translation)
+
+    for word in translation_copy:
+        position = translation_copy.index(word)
+        word_ascii_utf = unicodedata.normalize('NFD', word).encode('ascii', 'ignore').decode('utf-8')
+        conn_select = config.loadDatabaseConfiguration("bot.sqlite3")
+        c = conn_select.cursor()
+        c.execute('''SELECT * FROM translations_details WHERE idtranslation=? AND word=? AND position=?''', (id_translation, word_ascii_utf, position))
+        # obtener el valor con orden adecuado de la palabra-posicion
+        result_temp = c.fetchall()
+        if len(result_temp) > 0:
+            result = ast.literal_eval(result_temp[0][6])
+        else:
+            result = []
+        # append to list_pictos_to_join
+        length_result = len(result)
+        list_pictos_to_join.append(result[int(order[position]) % length_result])
+        conn_select.close()
+        translation_copy[position] = ""
