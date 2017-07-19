@@ -60,7 +60,7 @@ def getPictosFromQuery(word, color, language, search, nresults=500, wordType=2):
         if color == 'color':
             catalog = 'colorpictos'
         else:
-            catalog == 'bwpictos'
+            catalog = 'bwpictos'
 
         query_url = 'http://arasaac.org/api/index.php?callback=json'
         query_url += '&language='+language
