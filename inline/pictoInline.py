@@ -133,14 +133,24 @@ def pictoInline(bot, update):
     results = list()
     picto_list = getListPictos(['ES','EN','FR','IT','DE','CA'], query, force="false")
 
-    for picto in picto_list:
-        results.append(
-            telegram.InlineQueryResultPhoto(id=picto_list.index(picto),
-                                              title=picto['name'],
-                                              photo_url=picto['imagePNGURL'],
-                                              thumb_url=picto['thumbnailURL'],
-                                              caption=picto['name'],
-                                              input_message_content=telegram.InputTextMessageContent(picto['imagePNGURL'])
+    if picto_list != []:
+        for picto in picto_list:
+            results.append(
+                telegram.InlineQueryResultPhoto(id=picto_list.index(picto),
+                                                  title=picto['name'],
+                                                  photo_url=picto['imagePNGURL'],
+                                                  thumb_url=picto['thumbnailURL'],
+                                                  caption=picto['name'],
+                                                  input_message_content=telegram.InputTextMessageContent(picto['imagePNGURL'])
+                )
             )
-        )
+    else:
+        results.append(
+            telegram.InlineQueryResultPhoto(id=0,
+                                              title="UPPSSS",
+                                              photo_url="http://www.arasaac.org/repositorio/originales/5526.png",
+                                              thumb_url="http://www.arasaac.org/repositorio/originales/5526.png",
+                                              caption="No pictogram were found",
+                                              input_message_content=telegram.InputTextMessageContent("No pictogram found")))
+
     bot.answerInlineQuery(update.inline_query.id, results)
