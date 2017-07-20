@@ -15,6 +15,7 @@ from commands.about import about
 from commands.start import start
 import commands.pictos
 import commands.translate
+import commands.admin
 
 import inline.pictoInline
 
@@ -68,8 +69,11 @@ def main():
     updater.dispatcher.add_handler(CommandHandler('translate',
                                                   commands.translate.translate,
                                                   pass_args=True))
-
+    # About command
     updater.dispatcher.add_handler(CommandHandler('about', about))
+
+    # Restart commmand
+    updater.dispatcher.add_handler(CommandHandler('restart', commands.admin.restart))
 
     updater.dispatcher.add_handler(InlineQueryHandler(inline.pictoInline.pictoInline))
 
