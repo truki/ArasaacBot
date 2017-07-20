@@ -4,12 +4,13 @@ Bot that interact with Araasac API to retrieve resources
 Developer: @trukise
 Email: trukise@gmail.com
 '''
+
 import config
 import logging
 import urllib3
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, InlineQueryHandler, CallbackQueryHandler
 import telegram
+import telegram.ext
 
 from commands.about import about
 from commands.start import start
@@ -47,48 +48,48 @@ def main():
     config.createBotDatabase("bot.sqlite3")
 
     # Creating an updater object of the Bot
-    updater = Updater(TELEGRAM_API_KEY)
+    updater = telegram.ext.Updater(TELEGRAM_API_KEY)
 
     # Start command
-    updater.dispatcher.add_handler(CommandHandler('start', start))
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('start', start))
 
     # picsColor command - Get pictograms in color that contain the word passed
-    updater.dispatcher.add_handler(CommandHandler('picsColor',
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('picsColor',
                                                   commands.pictos.getPictosColor,
                                                   pass_args=True))
 
     # picsBW command - Get pictograms in BW that contains the word passed
-    updater.dispatcher.add_handler(CommandHandler('picsBW', commands.pictos.getPictosBW,
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('picsBW', commands.pictos.getPictosBW,
                                                   pass_args=True))
 
     # picto command - Command that init a wizard to make a search
-    updater.dispatcher.add_handler(CommandHandler('pics',
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('pics',
                                    commands.pictos.getPics,
                                    pass_args=True))
 
-    updater.dispatcher.add_handler(CommandHandler('translate',
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('translate',
                                                   commands.translate.translate,
                                                   pass_args=True))
     # About command
-    updater.dispatcher.add_handler(CommandHandler('about', about))
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('about', about))
 
     # Restart commmand
-    updater.dispatcher.add_handler(CommandHandler('restart', commands.admin.restart))
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('restart', commands.admin.restart))
 
-    updater.dispatcher.add_handler(InlineQueryHandler(inline.pictoInline.pictoInline))
+    updater.dispatcher.add_handler(telegram.ext.InlineQueryHandler(inline.pictoInline.pictoInline))
 
     # CallbackQueryHandlers os /pics command 1º Choose color 2º Choose language
     # 3º search property (start with, contains, end with and exactly)
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage1_color, pattern="pics.color"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage2_language, pattern="pics.language"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.pictos.getPics_stage3_search, pattern="pics.search"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.pictos.getPics_stage1_color, pattern="pics.color"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.pictos.getPics_stage2_language, pattern="pics.language"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.pictos.getPics_stage3_search, pattern="pics.search"))
 
 
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage1_language_callback, pattern="tr.lang"))
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.translate_stage2_word_callback, pattern="tr.word"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.translate.translate_stage1_language_callback, pattern="tr.lang"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.translate.translate_stage2_word_callback, pattern="tr.word"))
 
-    updater.dispatcher.add_handler(CallbackQueryHandler(commands.translate.agenda_callback, pattern="agenda"))
+    updater.dispatcher.add_handler(telegram.ext.CallbackQueryHandler(commands.translate.agenda_callback, pattern="agenda"))
 
 
     # init Bot
