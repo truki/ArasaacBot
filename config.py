@@ -25,8 +25,13 @@ def createBotDatabase(name):
                      (id INTEGER PRIMARY KEY AUTOINCREMENT, texToTranslate text, language text)''')
         c.execute('''CREATE TABLE IF NOT EXISTS translations_details
                      (id INTEGER PRIMARY KEY AUTOINCREMENT, idtranslation INTEGER, word text, position INTEGER, pictos text, pictoWord text, listPictosPath text)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS users
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, idUser text, nombre text, apellidos text, language text)''')
+        c.execute('''CREATE TABLE IF NOT EXISTS users_pictos
+                     (id INTEGER PRIMARY KEY AUTOINCREMENT, idUser text, picto text, pictoPath text)''')
         conn.commit()
-        conn.close()
+        logger.info("Created tables in Database:....... Ok.")
+
     except sqlite3.Error as e:
         logger.error("Error creating tables on database {}".format(e.args[0]))
     finally:
@@ -40,7 +45,7 @@ def loadArasaacApiKey(araasacApiKeyFile):
     try:
         file = open(araasacApiKeyFile, 'r')
         araasacApiKey = file.read().rstrip('\n')
-        logger.info("Araasac API KEY Read it: OK")
+        logger.info("Araasac API KEY Read it:...... OK")
         return araasacApiKey
     except:
         print("Error reading Araasac API Key: FAIL")
@@ -53,7 +58,7 @@ def loadTelegramApiKey(telegramApiKeyFile):
     try:
         file = open(telegramApiKeyFile, 'r')
         telegramApiKey = file.read().rstrip('\n')
-        logger.info("Telegram Bot API KEY Read it: OK")
+        logger.info("Telegram Bot API KEY Read it:............ OK")
         return telegramApiKey
     except:
         print("Error reading Telegram Bot API Key: FAIL")
@@ -65,9 +70,9 @@ def httpPool():
         proxy_url = parser.get('proxy_settings', 'url')
         proxy_port = parser.get('proxy_settings', 'port')
         proxyConfiguration = proxy_url+':'+proxy_port+'/'
-        logger.info("Proxy configuration: {}".format(proxyConfiguration))
+        logger.info("Proxy configuration is:............... {}".format(proxyConfiguration))
         return urllib3.ProxyManager(proxyConfiguration)
     else:
         proxyConfiguration = ""
-        logger.info("Proxy configuration: NO PROXY")
+        logger.info("Proxy configuration is:..... NO PROXY")
         return urllib3.PoolManager()
