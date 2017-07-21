@@ -61,6 +61,8 @@ def main():
     # picsBW command - Get pictograms in BW that contains the word passed
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('picsBW', commands.pictos.getPictosBW,
                                                   pass_args=True))
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('picsBN', commands.pictos.getPictosBW,
+                                                  pass_args=True))
 
     # picto command - Command that init a wizard to make a search
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('pics',
@@ -70,6 +72,10 @@ def main():
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('translate',
                                                   commands.translate.translate,
                                                   pass_args=True))
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('traducir',
+                                                  commands.translate.translate,
+                                                  pass_args=True))
+                                                  
     # About command
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('about', about))
 
