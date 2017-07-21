@@ -6,6 +6,8 @@
 images/translations/
 # Local configuration files
 proxy.ini
+# Database files
+bot.sqlite3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
