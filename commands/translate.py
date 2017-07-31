@@ -47,6 +47,11 @@ def getPictosFromArasaacAPI(language, word):
     '''
     pictos = []
 
+    # if the term to search has more than one word (using '_' to separate)
+    # the we substitute '_' to blank spaces
+    if word.find('_') != -1:
+        word = word.replace('_', ' ')
+
     query = 'http://arasaac.org/api/index.php?callback=json'
     query += '&language='+language
     query += '&word='+word
@@ -89,6 +94,7 @@ def getAndInsertWord(id_translation, language, word_ascci_utf, word, position):
             logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
 
         # Get pictos from Arasaac
+        print("Word_ascii: {}".format(word_ascci_utf))
         pictos = getPictosFromArasaacAPI(language, word_ascci_utf)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
@@ -97,6 +103,7 @@ def getAndInsertWord(id_translation, language, word_ascci_utf, word, position):
         # it is not necessary an order in this list
         listPictosPath = []
         for picto in pictos:
+            print("Picto: {}".format(picto))
             urlPicto = picto['imagePNGURL']
             filenamePicto = urlPicto.split('/')[-1]
             aux.images.getAndSavePicFromUrl(urlPicto, path, filenamePicto)
@@ -192,6 +199,7 @@ def translate_stage1_language_callback(bot, update):
         c = conn.cursor()
         c.execute('SELECT * FROM translations WHERE id=?', (id,))
         translation = c.fetchall()
+        print("Translation: {}".format(translation))
         logger.info("Translation: {}".format(translation))
         if len(translation)>0:
             translation = translation[0][1] # texToTranslate field
@@ -219,7 +227,11 @@ def translate_stage1_language_callback(bot, update):
 
     # After update with the language, inserts all the words into
     # translations_details table
+    print("Translation: {}".format(translation))
+
     translation_copy = list(translation)
+    print("Translation copy: {}".format(translation_copy))
+
     translation_copy2 = list(translation)
     insertWordsToTranslationsDetails(translation_copy, language, id)
 
@@ -283,6 +295,7 @@ def translate_stage2_word_callback(bot, update):
     data = query.data.split('.')
     # word specified
     word = data[2]
+    print(word)
     # position of the word
     position = int(data[4])
     # length of translation

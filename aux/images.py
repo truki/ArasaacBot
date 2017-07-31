@@ -55,6 +55,8 @@ def makePictoText(text, width=500, height=500, background_color="white",
     # create a text object that will be inserted in the picto
     font = ImageFont.truetype(font_type, font_size)
     # extract width and height of the text resultant
+    if text.find('_') != -1:
+        text = text.replace('_', ' ')
     width_text, height_text = draw.textsize(text, font)
     # if the width of the text is greater that width of the picto
     # then try with a less size of font, from 72, 71, 70, ... 24 (min)
