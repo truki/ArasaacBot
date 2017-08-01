@@ -49,8 +49,7 @@ def getPictosFromArasaacAPI(language, word):
 
     # if the term to search has more than one word (using '_' to separate)
     # the we substitute '_' to blank spaces
-    if word.find('_') != -1:
-        word = word.replace('_', ' ')
+
 
     query = 'http://arasaac.org/api/index.php?callback=json'
     query += '&language='+language
@@ -94,7 +93,6 @@ def getAndInsertWord(id_translation, language, word_ascci_utf, word, position):
             logger.error("while saving the pictoText image: {0},{1}".format(e.args[0], e.args[1]))
 
         # Get pictos from Arasaac
-        print("Word_ascii: {}".format(word_ascci_utf))
         pictos = getPictosFromArasaacAPI(language, word_ascci_utf)
         conn = config.loadDatabaseConfiguration("bot.sqlite3")
         c = conn.cursor()
@@ -137,6 +135,7 @@ def insertWordsToTranslationsDetails(text_to_translate, language,
     c = conn.cursor()
     c.execute('SELECT * FROM translations_details WHERE idtranslation= ?', (id_translation,))
     translation_result = c.fetchall()
+    print("Text to translate: {}".format(translation_result))
     conn.close()
     if len(translation_result)==0:      # cheack if exist
         pool = ThreadPool(len(text_to_translate))
@@ -295,7 +294,6 @@ def translate_stage2_word_callback(bot, update):
     data = query.data.split('.')
     # word specified
     word = data[2]
-    print(word)
     # position of the word
     position = int(data[4])
     # length of translation
