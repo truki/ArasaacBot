@@ -14,6 +14,7 @@ import telegram.ext
 
 from commands.about import about
 from commands.start import start
+import commands.help
 import commands.pictos
 import commands.translate
 import commands.admin
@@ -52,6 +53,8 @@ def main():
 
     # Start command
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('start', start))
+    # Help command
+    updater.dispatcher.add_handler(telegram.ext.CommandHandler('help', commands.help.help))
 
     # picsColor command - Get pictograms in color that contain the word passed
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('picsColor',
@@ -75,7 +78,7 @@ def main():
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('traducir',
                                                   commands.translate.translate,
                                                   pass_args=True))
-                                                  
+
     # About command
     updater.dispatcher.add_handler(telegram.ext.CommandHandler('about', about))
 
