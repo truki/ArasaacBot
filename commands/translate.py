@@ -266,14 +266,20 @@ def translate_stage1_language_callback(bot, update):
 
     path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
 
+    print("translation:--------->>>>> {}".format(translation))
+    print("Length: -------->>>>>>>> {}".format(len(''.join(translation))))
     for word in translation:
+        print("Word:-------->>>>> {}".format(word))
         position = translation.index(word)
+        print("Position:--------->>>>> {}".format(position))
         # preparing the inline keyboard to show for the phrase to translate
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
+        print("Callback data of {}:------->>>>>>> {}".format(word, 'tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
         translation[position] = ""
         # Create order list
     keyboard.append(keys)
     keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id)+'.len.'+str(length_translation)+'.ord.'+order_str)])
+    print("agenda callback data:------->>>>>>> {}".format('agenda.'+str(id)+'.len.'+str(length_translation)+'.ord.'+order_str))
     # Send message with image of translation and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
@@ -281,10 +287,10 @@ def translate_stage1_language_callback(bot, update):
     try:
         bot.sendPhoto(chat_id=query.message.chat_id,
                     photo=open(path_photo, 'rb'),
-                    caption="Choose the word button to change pictogramsx",
+                    caption="Choose the word button to change pictograms",
                     reply_markup = telegram.InlineKeyboardMarkup(keyboard))
     except Exception as e:
-        print("Error: {}".format(e.args[0]))
+        print("Error: {}".format(e))
 
 
 def translate_stage2_word_callback(bot, update):
