@@ -58,6 +58,32 @@ Command that run a "wizard" where the user can contruct the query to search the 
   Command that translate to pictograms (if its possible) a phrase introduced like arguments.
   Please don't insert putuation, question or exclamation symbols.
 
+#### Other commands
+
+* **start**
+
+  All Telegram's bot has one, show a brief information to begin with the bot.
+
+  ```/start```
+
+* **help**
+
+  Yes, could help you... :)
+
+  ```/help```
+
+* **About**
+
+    Some things about the bot and our team.
+
+  ```/About```
+
+* **Restart**
+
+  Restart de boot (only for admin user).
+
+  ```/restart```
+
 #### Inline Mode
 
 ```@arasaacbot <word>```
