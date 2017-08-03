@@ -273,7 +273,7 @@ def translate_stage1_language_callback(bot, update):
         position = translation.index(word)
         print("Position:--------->>>>> {}".format(position))
         # preparing the inline keyboard to show for the phrase to translate
-        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
+        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word[:5]+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
         print("Callback data of {}:------->>>>>>> {}".format(word, 'tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
         translation[position] = ""
         # Create order list
@@ -359,7 +359,7 @@ def translate_stage2_word_callback(bot, update):
     for word in translation:
         position_word = translation.index(word)
         # preparing the inline keyboard to show for the phrase to translate
-        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
+        keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word[:5]+'.pos.'+str(position_word)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id_translation)))
         translation[position_word] = ""
     keyboard.append(keys)
     keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id_translation)+'.len.'+str(length_translation)+'.ord.'+order_str)])
