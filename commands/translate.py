@@ -5,7 +5,6 @@ import logging
 import os
 import sqlite3
 import telegram
-import time
 import unicodedata
 
 import aux.images
@@ -226,11 +225,7 @@ def translate_stage1_language_callback(bot, update):
 
     # After update with the language, inserts all the words into
     # translations_details table
-    print("Translation: {}".format(translation))
-
     translation_copy = list(translation)
-    print("Translation copy: {}".format(translation_copy))
-
     translation_copy2 = list(translation)
     insertWordsToTranslationsDetails(translation_copy, language, id)
 
@@ -266,20 +261,14 @@ def translate_stage1_language_callback(bot, update):
 
     path_photo=os.getcwd()+"/images/translations/"+str(id)+"/"+str(id)+"_translation.png"
 
-    print("translation:--------->>>>> {}".format(translation))
-    print("Length: -------->>>>>>>> {}".format(len(''.join(translation))))
     for word in translation:
-        print("Word:-------->>>>> {}".format(word))
         position = translation.index(word)
-        print("Position:--------->>>>> {}".format(position))
         # preparing the inline keyboard to show for the phrase to translate
         keys.append(telegram.InlineKeyboardButton(word, callback_data='tr.word.'+word[:5]+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
-        print("Callback data of {}:------->>>>>>> {}".format(word, 'tr.word.'+word+'.pos.'+str(position)+'.len.'+str(length_translation)+'.ord.'+order_str+'.lang.ES.'+str(id)))
         translation[position] = ""
         # Create order list
     keyboard.append(keys)
     keyboard.append([telegram.InlineKeyboardButton("View agenda", callback_data='agenda.'+str(id)+'.len.'+str(length_translation)+'.ord.'+order_str)])
-    print("agenda callback data:------->>>>>>> {}".format('agenda.'+str(id)+'.len.'+str(length_translation)+'.ord.'+order_str))
     # Send message with image of translation and with the buttons
     # that could change every words that can be change (have more than one
     # pictograms available)
